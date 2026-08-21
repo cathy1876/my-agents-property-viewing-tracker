@@ -1,6 +1,6 @@
-# vibe-stack-supabase
+# my-agents-property-viewing-tracker
 
-Next.js 15 + Supabase starter for shipping vibe-coded apps fast. Clone, provision, build.
+A property viewing tracker for a real estate admin clerk — tracks clients, properties, and viewing appointments with status and result, viewable without login. Built on the vibe-stack-supabase starter (Next.js 15 + Supabase).
 
 ## Stack
 
