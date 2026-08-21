@@ -6,6 +6,13 @@ const STATUS_STYLES: Record<ViewingStatus, string> = {
   missed: "bg-red-50 text-red-700 ring-red-600/20",
 };
 
+// Full-box background per status, for the viewing list cards/rows.
+export const STATUS_BOX_STYLES: Record<ViewingStatus, string> = {
+  scheduled: "bg-blue-100 border-blue-300 hover:bg-blue-200",
+  completed: "bg-green-100 border-green-300 hover:bg-green-200",
+  missed: "bg-red-100 border-red-300 hover:bg-red-200",
+};
+
 const RESULT_STYLES: Record<ViewingResult, string> = {
   interested_ready_to_commit: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
   needs_another_viewing: "bg-amber-50 text-amber-700 ring-amber-600/20",

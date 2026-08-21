@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getDistinctAgents, getViewings } from "@/lib/data/viewings";
-import { StatusBadge, ResultBadge } from "@/components/badges";
+import { StatusBadge, ResultBadge, STATUS_BOX_STYLES } from "@/components/badges";
 import {
   VIEWING_RESULTS,
   VIEWING_STATUSES,
@@ -66,7 +66,7 @@ export default async function ViewingsPage({
         </div>
       </div>
 
-      <form className="mb-6 flex flex-wrap items-end gap-3 rounded-lg border border-neutral-200 p-4">
+      <form className="mb-6 flex flex-wrap items-end gap-3 rounded-lg border border-neutral-300 bg-neutral-100 p-4">
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-neutral-500">Agent</label>
           <select
@@ -180,7 +180,7 @@ export default async function ViewingsPage({
               <li key={v.id}>
                 <Link
                   href={`/viewings/${v.id}`}
-                  className="block rounded-lg border border-neutral-200 p-4 hover:bg-neutral-50"
+                  className={`block rounded-lg border p-4 ${STATUS_BOX_STYLES[v.status]}`}
                 >
                   <div className="mb-2 flex items-start justify-between gap-2">
                     <span className="font-medium text-neutral-900">
@@ -243,7 +243,7 @@ export default async function ViewingsPage({
               </thead>
               <tbody className="divide-y divide-neutral-100">
                 {viewings.map((v) => (
-                  <tr key={v.id} className="hover:bg-neutral-50">
+                  <tr key={v.id} className={STATUS_BOX_STYLES[v.status]}>
                     <td className="px-4 py-3">
                       <Link
                         href={`/viewings/${v.id}`}
