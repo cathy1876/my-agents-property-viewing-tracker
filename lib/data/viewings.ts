@@ -1,0 +1,211 @@
+import { createClient } from "@/lib/supabase/server";
+import type {
+  Viewing,
+  ViewingFilters,
+  ViewingResult,
+  ViewingStage,
+  ViewingStatus,
+  ViewingWithRelations,
+} from "@/lib/types";
+
+const VIEWING_SELECT =
+  "*, client:clients(id, name, phone), property:properties(id, address)";
+
+export interface ViewingInput {
+  client_id: string;
+  property_id: string;
+  agent_name?: string | null;
+  appointment_at: string;
+  stage: ViewingStage;
+  notes?: string | null;
+}
+
+export async function getViewings(
+  filters: ViewingFilters = {},
+): Promise<ViewingWithRelations[]> {
+  const supabase = await createClient();
+  let query = supabase
+    .from("viewings")
+    .select(VIEWING_SELECT)
+    .order("appointment_at", { ascending: false });
+
+  if (filters.agent) {
+    query = query.eq("agent_name", filters.agent);
+  }
+  if (filters.status) {
+    query = query.eq("status", filters.status);
+  }
+  if (filters.result) {
+    query = query.eq("result", filters.result);
+  }
+  if (filters.dateFrom) {
+    query = query.gte("appointment_at", filters.dateFrom);
+  }
+  if (filters.dateTo) {
+    query = query.lte("appointment_at", filters.dateTo);
+  }
+
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+
+  let rows = (data ?? []) as unknown as ViewingWithRelations[];
+
+  if (filters.needsFollowUp) {
+    const now = Date.now();
+    rows = rows.filter((v) => {
+      const isOverdue =
+        v.status === "scheduled" && new Date(v.appointment_at).getTime() < now;
+      const isMissed = v.status === "missed";
+      const isReadyToCommit =
+        v.status === "completed" && v.result === "interested_ready_to_commit";
+      return isOverdue || isMissed || isReadyToCommit;
+    });
+  }
+
+  return rows;
+}
+
+export async function getViewingsForClient(
+  clientId: string,
+): Promise<ViewingWithRelations[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("viewings")
+    .select(VIEWING_SELECT)
+    .eq("client_id", clientId)
+    .order("appointment_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []) as unknown as ViewingWithRelations[];
+}
+
+export async function getViewingsForProperty(
+  propertyId: string,
+): Promise<ViewingWithRelations[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("viewings")
+    .select(VIEWING_SELECT)
+    .eq("property_id", propertyId)
+    .order("appointment_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []) as unknown as ViewingWithRelations[];
+}
+
+export async function getDistinctAgents(): Promise<string[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("viewings")
+    .select("agent_name")
+    .not("agent_name", "is", null);
+
+  if (error) throw new Error(error.message);
+  const names = new Set<string>();
+  for (const row of data ?? []) {
+    if (row.agent_name) names.add(row.agent_name);
+  }
+  return Array.from(names).sort();
+}
+
+export async function getViewing(
+  id: string,
+): Promise<ViewingWithRelations | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("viewings")
+    .select(VIEWING_SELECT)
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  return data as unknown as ViewingWithRelations | null;
+}
+
+export async function createViewingRecord(
+  input: ViewingInput,
+): Promise<Viewing> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("viewings")
+    .insert({
+      client_id: input.client_id,
+      property_id: input.property_id,
+      agent_name: input.agent_name || null,
+      appointment_at: input.appointment_at,
+      stage: input.stage,
+      notes: input.notes || null,
+      status: "scheduled",
+    })
+    .select("*")
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function updateViewingRecord(
+  id: string,
+  input: ViewingInput,
+): Promise<Viewing> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("viewings")
+    .update({
+      client_id: input.client_id,
+      property_id: input.property_id,
+      agent_name: input.agent_name || null,
+      appointment_at: input.appointment_at,
+      stage: input.stage,
+      notes: input.notes || null,
+    })
+    .eq("id", id)
+    .select("*")
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function updateViewingStatus(
+  id: string,
+  status: ViewingStatus,
+): Promise<Viewing> {
+  const supabase = await createClient();
+  const updates: { status: ViewingStatus; result?: null } = { status };
+  // Reopening to scheduled clears any previously recorded result.
+  if (status === "scheduled" || status === "missed") {
+    updates.result = null;
+  }
+  const { data, error } = await supabase
+    .from("viewings")
+    .update(updates)
+    .eq("id", id)
+    .select("*")
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function updateViewingResult(
+  id: string,
+  result: ViewingResult,
+): Promise<Viewing> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("viewings")
+    .update({ result, status: "completed" })
+    .eq("id", id)
+    .select("*")
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function deleteViewingRecord(id: string): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("viewings").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
