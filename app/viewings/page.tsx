@@ -173,69 +173,111 @@ export default async function ViewingsPage({
           )}
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-neutral-200">
-          <table className="min-w-full divide-y divide-neutral-200 text-sm">
-            <thead className="bg-neutral-50">
-              <tr>
-                <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
-                  Appointment
-                </th>
-                <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
-                  Client
-                </th>
-                <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
-                  Property
-                </th>
-                <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
-                  Stage
-                </th>
-                <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
-                  Agent
-                </th>
-                <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
-                  Status
-                </th>
-                <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
-                  Result
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-100">
-              {viewings.map((v) => (
-                <tr key={v.id} className="hover:bg-neutral-50">
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/viewings/${v.id}`}
-                      className="font-medium text-neutral-900 hover:underline"
-                    >
+        <>
+          {/* Mobile: stacked cards, one per viewing, showing every field */}
+          <ul className="flex flex-col gap-3 md:hidden">
+            {viewings.map((v) => (
+              <li key={v.id}>
+                <Link
+                  href={`/viewings/${v.id}`}
+                  className="block rounded-lg border border-neutral-200 p-4 hover:bg-neutral-50"
+                >
+                  <div className="mb-2 flex items-start justify-between gap-2">
+                    <span className="font-medium text-neutral-900">
                       {formatDateTime(v.appointment_at)}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-neutral-700">
-                    {v.client?.name ?? "—"}
-                  </td>
-                  <td className="px-4 py-3 text-neutral-700">
-                    {v.property?.address ?? "—"}
-                  </td>
-                  <td className="px-4 py-3 text-neutral-700">{v.stage}</td>
-                  <td className="px-4 py-3 text-neutral-700">
-                    {v.agent_name ?? "—"}
-                  </td>
-                  <td className="px-4 py-3">
+                    </span>
                     <StatusBadge status={v.status} />
-                  </td>
-                  <td className="px-4 py-3">
-                    {v.status === "completed" ? (
-                      <ResultBadge result={v.result} />
-                    ) : (
-                      <span className="text-xs text-neutral-300">—</span>
-                    )}
-                  </td>
+                  </div>
+                  <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+                    <dt className="text-neutral-500">Client</dt>
+                    <dd className="text-neutral-700">{v.client?.name ?? "—"}</dd>
+                    <dt className="text-neutral-500">Property</dt>
+                    <dd className="text-neutral-700">
+                      {v.property?.address ?? "—"}
+                    </dd>
+                    <dt className="text-neutral-500">Stage</dt>
+                    <dd className="text-neutral-700">{v.stage}</dd>
+                    <dt className="text-neutral-500">Agent</dt>
+                    <dd className="text-neutral-700">{v.agent_name ?? "—"}</dd>
+                    <dt className="text-neutral-500">Result</dt>
+                    <dd>
+                      {v.status === "completed" ? (
+                        <ResultBadge result={v.result} />
+                      ) : (
+                        <span className="text-xs text-neutral-300">—</span>
+                      )}
+                    </dd>
+                  </dl>
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {/* Tablet/desktop: full table */}
+          <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 md:block">
+            <table className="min-w-full divide-y divide-neutral-200 text-sm">
+              <thead className="bg-neutral-50">
+                <tr>
+                  <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
+                    Appointment
+                  </th>
+                  <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
+                    Client
+                  </th>
+                  <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
+                    Property
+                  </th>
+                  <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
+                    Stage
+                  </th>
+                  <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
+                    Agent
+                  </th>
+                  <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
+                    Status
+                  </th>
+                  <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
+                    Result
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-neutral-100">
+                {viewings.map((v) => (
+                  <tr key={v.id} className="hover:bg-neutral-50">
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/viewings/${v.id}`}
+                        className="font-medium text-neutral-900 hover:underline"
+                      >
+                        {formatDateTime(v.appointment_at)}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-neutral-700">
+                      {v.client?.name ?? "—"}
+                    </td>
+                    <td className="px-4 py-3 text-neutral-700">
+                      {v.property?.address ?? "—"}
+                    </td>
+                    <td className="px-4 py-3 text-neutral-700">{v.stage}</td>
+                    <td className="px-4 py-3 text-neutral-700">
+                      {v.agent_name ?? "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={v.status} />
+                    </td>
+                    <td className="px-4 py-3">
+                      {v.status === "completed" ? (
+                        <ResultBadge result={v.result} />
+                      ) : (
+                        <span className="text-xs text-neutral-300">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

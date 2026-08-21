@@ -40,7 +40,7 @@ export function Sidebar() {
 
   return (
     <>
-      <header className="flex items-center justify-between border-b border-neutral-200 px-4 py-3 md:hidden">
+      <header className="relative z-20 flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-3 md:hidden">
         <span className="text-lg font-semibold">Viewing Tracker</span>
         <button
           type="button"

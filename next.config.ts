@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   // so we don't let them block a deployment.
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
+  // The floating dev-mode route indicator overlaps mobile card/table content.
+  devIndicators: false,
 };
 
 export default nextConfig;
