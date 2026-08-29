@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
 
   const viewings = await getViewings({
-    agent: params.get("agent") || undefined,
+    agentId: params.get("agent") || undefined,
     status: (params.get("status") as ViewingStatus) || undefined,
     result: (params.get("result") as ViewingResult) || undefined,
     dateFrom: params.get("dateFrom") || undefined,
@@ -28,6 +28,8 @@ export async function GET(request: NextRequest) {
     "Property",
     "Stage",
     "Agent",
+    "Agent Code",
+    "Agent Email",
     "Status",
     "Result",
     "Notes",
@@ -39,7 +41,9 @@ export async function GET(request: NextRequest) {
     v.client?.phone ?? "",
     v.property?.address ?? "",
     v.stage,
-    v.agent_name ?? "",
+    v.agent?.name ?? "",
+    v.agent?.agent_code ?? "",
+    v.agent?.agent_email ?? "",
     v.status,
     v.result ?? "",
     v.notes ?? "",

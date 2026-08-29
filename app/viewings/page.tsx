@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getDistinctAgents, getViewings, viewingNeedsFollowUp } from "@/lib/data/viewings";
+import { getViewings, viewingNeedsFollowUp } from "@/lib/data/viewings";
+import { getAgents } from "@/lib/data/agents";
 import { StatusBadge, ResultBadge, STATUS_BOX_STYLES } from "@/components/badges";
 import {
   VIEWING_RESULTS,
@@ -32,7 +33,7 @@ export default async function ViewingsPage({
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const params = await searchParams;
-  const agent = params.agent || undefined;
+  const agentId = params.agent || undefined;
   const status = (params.status as ViewingStatus) || undefined;
   const result = (params.result as ViewingResult) || undefined;
   const dateFrom = params.dateFrom || undefined;
@@ -40,14 +41,14 @@ export default async function ViewingsPage({
   const needsFollowUp = params.followup === "1";
 
   const [viewings, agents] = await Promise.all([
-    getViewings({ agent, status, result, dateFrom, dateTo, needsFollowUp }),
-    getDistinctAgents(),
+    getViewings({ agentId, status, result, dateFrom, dateTo, needsFollowUp }),
+    getAgents(),
   ]);
 
-  const hasFilters = agent || status || result || dateFrom || dateTo || needsFollowUp;
+  const hasFilters = agentId || status || result || dateFrom || dateTo || needsFollowUp;
 
   const exportQuery = new URLSearchParams();
-  if (agent) exportQuery.set("agent", agent);
+  if (agentId) exportQuery.set("agent", agentId);
   if (status) exportQuery.set("status", status);
   if (result) exportQuery.set("result", result);
   if (dateFrom) exportQuery.set("dateFrom", dateFrom);
@@ -79,13 +80,13 @@ export default async function ViewingsPage({
           <label className="text-xs font-medium text-neutral-500">Agent</label>
           <select
             name="agent"
-            defaultValue={agent || ""}
+            defaultValue={agentId || ""}
             className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
           >
             <option value="">All agents</option>
             {agents.map((a) => (
-              <option key={a} value={a}>
-                {a}
+              <option key={a.id} value={a.id}>
+                {a.name}
               </option>
             ))}
           </select>
@@ -206,7 +207,15 @@ export default async function ViewingsPage({
                     <dt className="text-neutral-500">Stage</dt>
                     <dd className="text-neutral-700">{v.stage}</dd>
                     <dt className="text-neutral-500">Agent</dt>
-                    <dd className="text-neutral-700">{v.agent_name ?? "—"}</dd>
+                    <dd className="text-neutral-700">{v.agent?.name ?? "—"}</dd>
+                    <dt className="text-neutral-500">Agent Code</dt>
+                    <dd className="text-neutral-700">
+                      {v.agent?.agent_code ?? "—"}
+                    </dd>
+                    <dt className="text-neutral-500">Agent Email</dt>
+                    <dd className="text-neutral-700">
+                      {v.agent?.agent_email ?? "—"}
+                    </dd>
                     <dt className="text-neutral-500">Result</dt>
                     <dd>
                       {v.status === "completed" ? (
@@ -250,6 +259,12 @@ export default async function ViewingsPage({
                     Agent
                   </th>
                   <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
+                    Agent Code
+                  </th>
+                  <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
+                    Agent Email
+                  </th>
+                  <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
                     Status
                   </th>
                   <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
@@ -279,7 +294,13 @@ export default async function ViewingsPage({
                     </td>
                     <td className="px-4 py-3 text-neutral-700">{v.stage}</td>
                     <td className="px-4 py-3 text-neutral-700">
-                      {v.agent_name ?? "—"}
+                      {v.agent?.name ?? "—"}
+                    </td>
+                    <td className="px-4 py-3 text-neutral-700">
+                      {v.agent?.agent_code ?? "—"}
+                    </td>
+                    <td className="px-4 py-3 text-neutral-700">
+                      {v.agent?.agent_email ?? "—"}
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={v.status} />

@@ -9,12 +9,12 @@ import type {
 } from "@/lib/types";
 
 const VIEWING_SELECT =
-  "*, client:clients(id, name, phone), property:properties(id, address)";
+  "*, client:clients(id, name, phone), property:properties(id, address), agent:agents(id, name, agent_code, agent_email)";
 
 export interface ViewingInput {
   client_id: string;
   property_id: string;
-  agent_name?: string | null;
+  agent_id: string;
   appointment_at: string;
   stage: ViewingStage;
   notes?: string | null;
@@ -29,8 +29,8 @@ export async function getViewings(
     .select(VIEWING_SELECT)
     .order("appointment_at", { ascending: false });
 
-  if (filters.agent) {
-    query = query.eq("agent_name", filters.agent);
+  if (filters.agentId) {
+    query = query.eq("agent_id", filters.agentId);
   }
   if (filters.status) {
     query = query.eq("status", filters.status);
@@ -96,21 +96,6 @@ export async function getViewingsForProperty(
   return (data ?? []) as unknown as ViewingWithRelations[];
 }
 
-export async function getDistinctAgents(): Promise<string[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("viewings")
-    .select("agent_name")
-    .not("agent_name", "is", null);
-
-  if (error) throw new Error(error.message);
-  const names = new Set<string>();
-  for (const row of data ?? []) {
-    if (row.agent_name) names.add(row.agent_name);
-  }
-  return Array.from(names).sort();
-}
-
 export async function getViewing(
   id: string,
 ): Promise<ViewingWithRelations | null> {
@@ -134,7 +119,7 @@ export async function createViewingRecord(
     .insert({
       client_id: input.client_id,
       property_id: input.property_id,
-      agent_name: input.agent_name || null,
+      agent_id: input.agent_id,
       appointment_at: input.appointment_at,
       stage: input.stage,
       notes: input.notes || null,
@@ -157,7 +142,7 @@ export async function updateViewingRecord(
     .update({
       client_id: input.client_id,
       property_id: input.property_id,
-      agent_name: input.agent_name || null,
+      agent_id: input.agent_id,
       appointment_at: input.appointment_at,
       stage: input.stage,
       notes: input.notes || null,

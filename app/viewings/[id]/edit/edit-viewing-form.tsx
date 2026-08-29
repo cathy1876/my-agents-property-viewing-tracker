@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { updateViewingAction } from "@/lib/actions/viewings";
 import { SubmitButton } from "@/components/submit-button";
 import { VIEWING_STAGES } from "@/lib/types";
-import type { Client, Property, ViewingWithRelations } from "@/lib/types";
+import type { Agent, Client, Property, ViewingWithRelations } from "@/lib/types";
 import type { ActionResult } from "@/lib/actions/clients";
 
 const initialState: ActionResult = { success: true };
@@ -25,10 +25,12 @@ export function EditViewingForm({
   viewing,
   clients,
   properties,
+  agents,
 }: {
   viewing: ViewingWithRelations;
   clients: Client[];
   properties: Property[];
+  agents: Agent[];
 }) {
   const action = updateViewingAction.bind(null, viewing.id);
   const [state, formAction] = useActionState(action, initialState);
@@ -109,15 +111,23 @@ export function EditViewingForm({
           </select>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-neutral-500">
-            Agent name *
-          </label>
-          <input
-            name="agent_name"
+          <label className="text-xs font-medium text-neutral-500">Agent *</label>
+          <select
+            name="agent_id"
             required
-            defaultValue={viewing.agent_name ?? ""}
+            defaultValue={viewing.agent_id ?? ""}
             className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
-          />
+          >
+            <option value="" disabled>
+              Select an agent…
+            </option>
+            {agents.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.name}
+                {a.agent_code ? ` (${a.agent_code})` : ""}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
       <div className="flex flex-col gap-1">

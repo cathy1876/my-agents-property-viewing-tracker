@@ -1,11 +1,13 @@
 import { getClients } from "@/lib/data/clients";
 import { getProperties } from "@/lib/data/properties";
+import { getAgents } from "@/lib/data/agents";
 import { NewViewingForm } from "./new-viewing-form";
 
 export default async function NewViewingPage() {
-  const [clients, properties] = await Promise.all([
+  const [clients, properties, agents] = await Promise.all([
     getClients(),
     getProperties(),
+    getAgents(),
   ]);
 
   return (
@@ -13,7 +15,7 @@ export default async function NewViewingPage() {
       <h1 className="mb-6 text-2xl font-semibold tracking-tight">
         New Viewing
       </h1>
-      <NewViewingForm clients={clients} properties={properties} />
+      <NewViewingForm clients={clients} properties={properties} agents={agents} />
     </div>
   );
 }

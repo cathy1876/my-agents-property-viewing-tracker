@@ -4,8 +4,7 @@ import { useActionState, useState } from "react";
 import { createViewingAction } from "@/lib/actions/viewings";
 import { SubmitButton } from "@/components/submit-button";
 import { VIEWING_STAGES } from "@/lib/types";
-import type { Client } from "@/lib/types";
-import type { Property } from "@/lib/types";
+import type { Agent, Client, Property } from "@/lib/types";
 import type { ActionResult } from "@/lib/actions/clients";
 
 const initialState: ActionResult = { success: true };
@@ -13,9 +12,11 @@ const initialState: ActionResult = { success: true };
 export function NewViewingForm({
   clients,
   properties,
+  agents,
 }: {
   clients: Client[];
   properties: Property[];
+  agents: Agent[];
 }) {
   const [state, formAction] = useActionState(createViewingAction, initialState);
   const [clientMode, setClientMode] = useState<"existing" | "new">(
@@ -197,14 +198,34 @@ export function NewViewingForm({
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-neutral-500">
-            Agent name *
+            Agent *
           </label>
-          <input
-            name="agent_name"
-            required
-            placeholder="e.g. Sipho Khumalo"
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
-          />
+          {agents.length === 0 ? (
+            <p className="text-sm text-neutral-500">
+              No agents yet.{" "}
+              <a href="/agents/new" className="font-medium text-neutral-900 underline">
+                Add an agent first
+              </a>{" "}
+              before creating a viewing.
+            </p>
+          ) : (
+            <select
+              name="agent_id"
+              required
+              defaultValue=""
+              className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            >
+              <option value="" disabled>
+                Select an agent…
+              </option>
+              {agents.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                  {a.agent_code ? ` (${a.agent_code})` : ""}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-neutral-500">Notes</label>

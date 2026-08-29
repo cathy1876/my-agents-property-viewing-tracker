@@ -50,7 +50,7 @@ export interface Viewing {
   user_id: string | null;
   client_id: string;
   property_id: string;
-  agent_name: string | null;
+  agent_id: string | null;
   appointment_at: string;
   stage: ViewingStage;
   status: ViewingStatus;
@@ -66,10 +66,11 @@ export interface Viewing {
 export interface ViewingWithRelations extends Viewing {
   client: Pick<Client, "id" | "name" | "phone"> | null;
   property: Pick<Property, "id" | "address"> | null;
+  agent: Pick<Agent, "id" | "name" | "agent_code" | "agent_email"> | null;
 }
 
 export interface ViewingFilters {
-  agent?: string;
+  agentId?: string;
   status?: ViewingStatus;
   result?: ViewingResult;
   dateFrom?: string;

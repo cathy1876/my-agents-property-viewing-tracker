@@ -86,9 +86,26 @@ export default async function ViewingDetailPage({
         </div>
         <div>
           <div className="text-xs font-medium text-neutral-500">Agent</div>
-          <div className="font-medium text-neutral-900">
-            {viewing.agent_name || "—"}
-          </div>
+          {viewing.agent ? (
+            <Link
+              href={`/agents/${viewing.agent.id}`}
+              className="font-medium text-neutral-900 hover:underline"
+            >
+              {viewing.agent.name}
+            </Link>
+          ) : (
+            <span className="text-neutral-400">—</span>
+          )}
+          {viewing.agent?.agent_code && (
+            <div className="text-sm text-neutral-500">
+              {viewing.agent.agent_code}
+            </div>
+          )}
+          {viewing.agent?.agent_email && (
+            <div className="text-sm text-neutral-500">
+              {viewing.agent.agent_email}
+            </div>
+          )}
         </div>
         <div>
           <div className="text-xs font-medium text-neutral-500">Status</div>

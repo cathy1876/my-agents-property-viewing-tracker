@@ -66,10 +66,10 @@ export async function createViewingAction(
   const date = String(formData.get("appointment_date") || "");
   const time = String(formData.get("appointment_time") || "");
   const stage = String(formData.get("stage") || "1st") as ViewingStage;
-  const agentName = String(formData.get("agent_name") || "").trim();
+  const agentId = String(formData.get("agent_id") || "").trim();
 
-  if (!agentName) {
-    return { success: false, error: "Agent name is required." };
+  if (!agentId) {
+    return { success: false, error: "Agent is required." };
   }
 
   const appointmentAt = toTimestamp(date, time);
@@ -92,7 +92,7 @@ export async function createViewingAction(
     const viewing = await createViewingRecord({
       client_id: clientId,
       property_id: propertyId,
-      agent_name: agentName,
+      agent_id: agentId,
       appointment_at: appointmentAt,
       stage,
       notes: String(formData.get("notes") || "").trim() || null,
@@ -116,11 +116,11 @@ export async function updateViewingAction(
   const date = String(formData.get("appointment_date") || "");
   const time = String(formData.get("appointment_time") || "");
   const stage = String(formData.get("stage") || "1st") as ViewingStage;
-  const agentName = String(formData.get("agent_name") || "").trim();
+  const agentId = String(formData.get("agent_id") || "").trim();
   const clientId = String(formData.get("client_id") || "").trim();
   const propertyId = String(formData.get("property_id") || "").trim();
 
-  if (!agentName) return { success: false, error: "Agent name is required." };
+  if (!agentId) return { success: false, error: "Agent is required." };
   if (!clientId || !propertyId)
     return { success: false, error: "Client and property are required." };
 
@@ -136,7 +136,7 @@ export async function updateViewingAction(
     await updateViewingRecord(id, {
       client_id: clientId,
       property_id: propertyId,
-      agent_name: agentName,
+      agent_id: agentId,
       appointment_at: appointmentAt,
       stage,
       notes: String(formData.get("notes") || "").trim() || null,

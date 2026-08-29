@@ -38,7 +38,7 @@ export function ViewingMiniList({
               {showClient && showProperty && " · "}
               {showProperty && v.property?.address}
               {(showClient || showProperty) && " · "}
-              {v.stage} · {v.agent_name || "—"}
+              {v.stage} · {v.agent?.name || "—"}
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
