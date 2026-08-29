@@ -51,18 +51,21 @@ export async function getViewings(
   let rows = (data ?? []) as unknown as ViewingWithRelations[];
 
   if (filters.needsFollowUp) {
-    const now = Date.now();
-    rows = rows.filter((v) => {
-      const isOverdue =
-        v.status === "scheduled" && new Date(v.appointment_at).getTime() < now;
-      const isMissed = v.status === "missed";
-      const isReadyToCommit =
-        v.status === "completed" && v.result === "interested_ready_to_commit";
-      return isOverdue || isMissed || isReadyToCommit;
-    });
+    rows = rows.filter(viewingNeedsFollowUp);
   }
 
   return rows;
+}
+
+// Rule-based follow-up marker (docs/INTELLIGENCE_LAYER.md): scheduled and
+// overdue, missed outright, or completed with a ready-to-commit result.
+export function viewingNeedsFollowUp(v: Pick<Viewing, "status" | "result" | "appointment_at">): boolean {
+  const isOverdue =
+    v.status === "scheduled" && new Date(v.appointment_at).getTime() < Date.now();
+  const isMissed = v.status === "missed";
+  const isReadyToCommit =
+    v.status === "completed" && v.result === "interested_ready_to_commit";
+  return isOverdue || isMissed || isReadyToCommit;
 }
 
 export async function getViewingsForClient(

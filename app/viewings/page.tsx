@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getDistinctAgents, getViewings } from "@/lib/data/viewings";
+import { getDistinctAgents, getViewings, viewingNeedsFollowUp } from "@/lib/data/viewings";
 import { StatusBadge, ResultBadge, STATUS_BOX_STYLES } from "@/components/badges";
 import {
   VIEWING_RESULTS,
@@ -10,6 +10,14 @@ import {
 import { RESULT_LABEL_MAP } from "@/components/badges";
 
 export const dynamic = "force-dynamic";
+
+function FollowUpMarker() {
+  return (
+    <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-600/30">
+      ⚑ Needs follow-up
+    </span>
+  );
+}
 
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString("en-ZA", {
@@ -207,6 +215,14 @@ export default async function ViewingsPage({
                         <span className="text-xs text-neutral-300">—</span>
                       )}
                     </dd>
+                    <dt className="text-neutral-500">Follow-up</dt>
+                    <dd>
+                      {viewingNeedsFollowUp(v) ? (
+                        <FollowUpMarker />
+                      ) : (
+                        <span className="text-xs text-neutral-300">—</span>
+                      )}
+                    </dd>
                   </dl>
                 </Link>
               </li>
@@ -239,6 +255,9 @@ export default async function ViewingsPage({
                   <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
                     Result
                   </th>
+                  <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
+                    Follow-up
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100">
@@ -268,6 +287,13 @@ export default async function ViewingsPage({
                     <td className="px-4 py-3">
                       {v.status === "completed" ? (
                         <ResultBadge result={v.result} />
+                      ) : (
+                        <span className="text-xs text-neutral-300">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      {viewingNeedsFollowUp(v) ? (
+                        <FollowUpMarker />
                       ) : (
                         <span className="text-xs text-neutral-300">—</span>
                       )}
