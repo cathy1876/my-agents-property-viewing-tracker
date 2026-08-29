@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/viewings", label: "Viewings" },
   { href: "/clients", label: "Clients" },
   { href: "/properties", label: "Properties" },
+  { href: "/agents", label: "Agents" },
 ];
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {

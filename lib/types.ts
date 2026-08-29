@@ -27,6 +27,15 @@ export interface Client {
   created_at: string;
 }
 
+export interface Agent {
+  id: string;
+  user_id: string | null;
+  name: string;
+  agent_code: string | null;
+  agent_email: string | null;
+  created_at: string;
+}
+
 export interface Property {
   id: string;
   user_id: string | null;
