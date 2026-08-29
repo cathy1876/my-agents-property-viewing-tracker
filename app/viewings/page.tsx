@@ -244,7 +244,7 @@ export default async function ViewingsPage({
               <thead className="bg-neutral-50">
                 <tr>
                   <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
-                    Appointment
+                    Scheduled Date
                   </th>
                   <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
                     Client

@@ -155,7 +155,7 @@ export function NewViewingForm({
       </fieldset>
 
       <fieldset className="space-y-3 rounded-lg border border-neutral-200 p-4">
-        <legend className="px-1 text-sm font-medium">Appointment</legend>
+        <legend className="px-1 text-sm font-medium">Scheduled Date</legend>
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="flex flex-col gap-1">
             <label className="text-xs font-medium text-neutral-500">

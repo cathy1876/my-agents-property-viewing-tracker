@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   });
 
   const headers = [
-    "Appointment",
+    "Scheduled Date",
     "Client",
     "Client Phone",
     "Property",
