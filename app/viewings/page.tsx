@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getViewings, viewingNeedsFollowUp } from "@/lib/data/viewings";
+import { getViewings } from "@/lib/data/viewings";
 import { getAgents } from "@/lib/data/agents";
 import { StatusBadge, ResultBadge, STATUS_BOX_STYLES } from "@/components/badges";
 import {
@@ -226,7 +226,7 @@ export default async function ViewingsPage({
                     </dd>
                     <dt className="text-neutral-500">Follow-up</dt>
                     <dd>
-                      {viewingNeedsFollowUp(v) ? (
+                      {v.follow_up ? (
                         <FollowUpMarker />
                       ) : (
                         <span className="text-xs text-neutral-300">—</span>
@@ -313,7 +313,7 @@ export default async function ViewingsPage({
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      {viewingNeedsFollowUp(v) ? (
+                      {v.follow_up ? (
                         <FollowUpMarker />
                       ) : (
                         <span className="text-xs text-neutral-300">—</span>

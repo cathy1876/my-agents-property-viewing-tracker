@@ -7,6 +7,7 @@ import { createPropertyRecord } from "@/lib/data/properties";
 import {
   createViewingRecord,
   deleteViewingRecord,
+  updateViewingFollowUp,
   updateViewingRecord,
   updateViewingResult,
   updateViewingStatus,
@@ -163,6 +164,16 @@ export async function setViewingResultAction(
   result: ViewingResult,
 ): Promise<void> {
   await updateViewingResult(id, result);
+  revalidatePath("/viewings");
+  revalidatePath(`/viewings/${id}`);
+}
+
+export async function setViewingFollowUpAction(
+  id: string,
+  formData: FormData,
+): Promise<void> {
+  const followUp = formData.get("follow_up") === "on";
+  await updateViewingFollowUp(id, followUp);
   revalidatePath("/viewings");
   revalidatePath(`/viewings/${id}`);
 }

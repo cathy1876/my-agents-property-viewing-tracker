@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
     "Agent Email",
     "Status",
     "Result",
+    "Follow-up",
     "Notes",
   ];
 
@@ -46,6 +47,7 @@ export async function GET(request: NextRequest) {
     v.agent?.agent_email ?? "",
     v.status,
     v.result ?? "",
+    v.follow_up ? "Yes" : "No",
     v.notes ?? "",
   ]);
 

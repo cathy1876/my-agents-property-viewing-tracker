@@ -60,6 +60,7 @@ export interface Viewing {
   result_summary_source: string | null;
   result_summary_confidence: number | null;
   result_summary_review_status: string | null;
+  follow_up: boolean;
   created_at: string;
 }
 

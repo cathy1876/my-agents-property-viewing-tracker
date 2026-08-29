@@ -44,28 +44,14 @@ export async function getViewings(
   if (filters.dateTo) {
     query = query.lte("appointment_at", filters.dateTo);
   }
+  if (filters.needsFollowUp) {
+    query = query.eq("follow_up", true);
+  }
 
   const { data, error } = await query;
   if (error) throw new Error(error.message);
 
-  let rows = (data ?? []) as unknown as ViewingWithRelations[];
-
-  if (filters.needsFollowUp) {
-    rows = rows.filter(viewingNeedsFollowUp);
-  }
-
-  return rows;
-}
-
-// Rule-based follow-up marker (docs/INTELLIGENCE_LAYER.md): scheduled and
-// overdue, missed outright, or completed with a ready-to-commit result.
-export function viewingNeedsFollowUp(v: Pick<Viewing, "status" | "result" | "appointment_at">): boolean {
-  const isOverdue =
-    v.status === "scheduled" && new Date(v.appointment_at).getTime() < Date.now();
-  const isMissed = v.status === "missed";
-  const isReadyToCommit =
-    v.status === "completed" && v.result === "interested_ready_to_commit";
-  return isOverdue || isMissed || isReadyToCommit;
+  return (data ?? []) as unknown as ViewingWithRelations[];
 }
 
 export async function getViewingsForClient(
@@ -184,6 +170,22 @@ export async function updateViewingResult(
   const { data, error } = await supabase
     .from("viewings")
     .update({ result, status: "completed" })
+    .eq("id", id)
+    .select("*")
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function updateViewingFollowUp(
+  id: string,
+  followUp: boolean,
+): Promise<Viewing> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("viewings")
+    .update({ follow_up: followUp })
     .eq("id", id)
     .select("*")
     .single();

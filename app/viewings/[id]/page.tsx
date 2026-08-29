@@ -5,8 +5,10 @@ import { StatusBadge, ResultBadge } from "@/components/badges";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import {
   deleteViewingAction,
+  setViewingFollowUpAction,
   setViewingStatusAction,
 } from "@/lib/actions/viewings";
+import { SubmitButton } from "@/components/submit-button";
 import { ResultForm } from "./result-form";
 
 function formatDateTime(iso: string): string {
@@ -164,6 +166,22 @@ export default async function ViewingDetailPage({
             </button>
           </form>
         </div>
+
+        <form
+          action={setViewingFollowUpAction.bind(null, id)}
+          className="mt-4 flex items-center gap-3 border-t border-neutral-200 pt-4"
+        >
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              name="follow_up"
+              defaultChecked={viewing.follow_up}
+              className="rounded border-neutral-300"
+            />
+            Needs follow-up
+          </label>
+          <SubmitButton className="px-3 py-1.5">Save</SubmitButton>
+        </form>
       </div>
 
       <div id="result" className="rounded-lg border border-neutral-200 p-5">
