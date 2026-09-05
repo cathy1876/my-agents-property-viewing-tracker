@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getViewings } from "@/lib/data/viewings";
-import type { ViewingResult, ViewingStatus } from "@/lib/types";
+import type { ViewingOutcome, ViewingStatus } from "@/lib/types";
 
 function csvEscape(value: string): string {
   if (/[",\n]/.test(value)) {
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   const viewings = await getViewings({
     agentId: params.get("agent") || undefined,
     status: (params.get("status") as ViewingStatus) || undefined,
-    result: (params.get("result") as ViewingResult) || undefined,
+    outcome: (params.get("outcome") as ViewingOutcome) || undefined,
     dateFrom: params.get("dateFrom") || undefined,
     dateTo: params.get("dateTo") || undefined,
     needsFollowUp: params.get("followup") === "1",
@@ -26,12 +26,11 @@ export async function GET(request: NextRequest) {
     "Client",
     "Client Phone",
     "Property",
-    "Stage",
     "Agent",
     "Agent Code",
     "Agent Email",
     "Status",
-    "Result",
+    "Outcome",
     "Follow-up",
     "Notes",
   ];
@@ -41,12 +40,11 @@ export async function GET(request: NextRequest) {
     v.client?.name ?? "",
     v.client?.phone ?? "",
     v.property?.address ?? "",
-    v.stage,
     v.agent?.name ?? "",
     v.agent?.agent_code ?? "",
     v.agent?.agent_email ?? "",
     v.status,
-    v.result ?? "",
+    v.outcome ?? "",
     v.follow_up ? "Yes" : "No",
     v.notes ?? "",
   ]);

@@ -8,11 +8,11 @@ import {
   createViewingRecord,
   deleteViewingRecord,
   updateViewingFollowUp,
+  updateViewingOutcome,
   updateViewingRecord,
-  updateViewingResult,
   updateViewingStatus,
 } from "@/lib/data/viewings";
-import type { ViewingResult, ViewingStage, ViewingStatus } from "@/lib/types";
+import type { ViewingOutcome, ViewingStatus } from "@/lib/types";
 import type { ActionResult } from "@/lib/actions/clients";
 
 function toTimestamp(date: string, time: string): string | null {
@@ -66,7 +66,6 @@ export async function createViewingAction(
 ): Promise<ActionResult> {
   const date = String(formData.get("appointment_date") || "");
   const time = String(formData.get("appointment_time") || "");
-  const stage = String(formData.get("stage") || "1st") as ViewingStage;
   const agentId = String(formData.get("agent_id") || "").trim();
 
   if (!agentId) {
@@ -95,7 +94,6 @@ export async function createViewingAction(
       property_id: propertyId,
       agent_id: agentId,
       appointment_at: appointmentAt,
-      stage,
       notes: String(formData.get("notes") || "").trim() || null,
     });
     viewingId = viewing.id;
@@ -116,7 +114,6 @@ export async function updateViewingAction(
 ): Promise<ActionResult> {
   const date = String(formData.get("appointment_date") || "");
   const time = String(formData.get("appointment_time") || "");
-  const stage = String(formData.get("stage") || "1st") as ViewingStage;
   const agentId = String(formData.get("agent_id") || "").trim();
   const clientId = String(formData.get("client_id") || "").trim();
   const propertyId = String(formData.get("property_id") || "").trim();
@@ -139,7 +136,6 @@ export async function updateViewingAction(
       property_id: propertyId,
       agent_id: agentId,
       appointment_at: appointmentAt,
-      stage,
       notes: String(formData.get("notes") || "").trim() || null,
     });
   } catch (err) {
@@ -159,11 +155,11 @@ export async function setViewingStatusAction(
   revalidatePath(`/viewings/${id}`);
 }
 
-export async function setViewingResultAction(
+export async function setViewingOutcomeAction(
   id: string,
-  result: ViewingResult,
+  outcome: ViewingOutcome,
 ): Promise<void> {
-  await updateViewingResult(id, result);
+  await updateViewingOutcome(id, outcome);
   revalidatePath("/viewings");
   revalidatePath(`/viewings/${id}`);
 }

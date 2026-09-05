@@ -1,4 +1,4 @@
-import type { ViewingResult, ViewingStatus } from "@/lib/types";
+import type { ViewingOutcome, ViewingStatus } from "@/lib/types";
 
 const STATUS_STYLES: Record<ViewingStatus, string> = {
   scheduled: "bg-blue-50 text-blue-700 ring-blue-600/20",
@@ -13,16 +13,16 @@ export const STATUS_BOX_STYLES: Record<ViewingStatus, string> = {
   missed: "bg-red-100 border-red-300 hover:bg-red-200",
 };
 
-const RESULT_STYLES: Record<ViewingResult, string> = {
-  interested_ready_to_commit: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
-  needs_another_viewing: "bg-amber-50 text-amber-700 ring-amber-600/20",
-  not_interested: "bg-neutral-100 text-neutral-600 ring-neutral-500/20",
+const OUTCOME_STYLES: Record<ViewingOutcome, string> = {
+  ready_to_sign: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
+  request_another_viewing: "bg-amber-50 text-amber-700 ring-amber-600/20",
+  dropped_not_interested: "bg-neutral-100 text-neutral-600 ring-neutral-500/20",
 };
 
-const RESULT_LABELS: Record<ViewingResult, string> = {
-  interested_ready_to_commit: "Interested — ready to commit",
-  needs_another_viewing: "Needs another viewing",
-  not_interested: "Not interested",
+const OUTCOME_LABELS: Record<ViewingOutcome, string> = {
+  ready_to_sign: "Ready to sign",
+  request_another_viewing: "Request another viewing",
+  dropped_not_interested: "Dropped - Not interested",
 };
 
 export function StatusBadge({ status }: { status: ViewingStatus }) {
@@ -35,19 +35,19 @@ export function StatusBadge({ status }: { status: ViewingStatus }) {
   );
 }
 
-export function ResultBadge({ result }: { result: ViewingResult | null }) {
-  if (!result) {
+export function OutcomeBadge({ outcome }: { outcome: ViewingOutcome | null }) {
+  if (!outcome) {
     return (
-      <span className="text-xs text-neutral-400 italic">No result set yet</span>
+      <span className="text-xs text-neutral-400 italic">No outcome set yet</span>
     );
   }
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${RESULT_STYLES[result]}`}
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${OUTCOME_STYLES[outcome]}`}
     >
-      {RESULT_LABELS[result]}
+      {OUTCOME_LABELS[outcome]}
     </span>
   );
 }
 
-export const RESULT_LABEL_MAP = RESULT_LABELS;
+export const OUTCOME_LABEL_MAP = OUTCOME_LABELS;

@@ -3,7 +3,6 @@
 import { useActionState } from "react";
 import { updateViewingAction } from "@/lib/actions/viewings";
 import { SubmitButton } from "@/components/submit-button";
-import { VIEWING_STAGES } from "@/lib/types";
 import type { Agent, Client, Property, ViewingWithRelations } from "@/lib/types";
 import type { ActionResult } from "@/lib/actions/clients";
 
@@ -95,20 +94,6 @@ export function EditViewingForm({
             defaultValue={toTimeInput(viewing.appointment_at)}
             className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
           />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-neutral-500">Stage *</label>
-          <select
-            name="stage"
-            defaultValue={viewing.stage}
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
-          >
-            {VIEWING_STAGES.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-neutral-500">Agent *</label>

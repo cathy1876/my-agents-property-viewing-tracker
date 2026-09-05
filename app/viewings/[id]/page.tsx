@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getViewing } from "@/lib/data/viewings";
-import { StatusBadge, ResultBadge } from "@/components/badges";
+import { StatusBadge, OutcomeBadge } from "@/components/badges";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import {
   deleteViewingAction,
@@ -9,7 +9,7 @@ import {
   setViewingStatusAction,
 } from "@/lib/actions/viewings";
 import { SubmitButton } from "@/components/submit-button";
-import { ResultForm } from "./result-form";
+import { OutcomeForm } from "./outcome-form";
 
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString("en-ZA", {
@@ -34,7 +34,10 @@ export default async function ViewingDetailPage({
           <Link href="/viewings" className="text-sm text-neutral-500 hover:underline">
             ← Back to viewings
           </Link>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">
+          <div className="mt-1 text-xs font-medium text-neutral-500">
+            Scheduled Date
+          </div>
+          <h1 className="text-2xl font-semibold tracking-tight">
             {formatDateTime(viewing.appointment_at)}
           </h1>
         </div>
@@ -83,10 +86,6 @@ export default async function ViewingDetailPage({
           )}
         </div>
         <div>
-          <div className="text-xs font-medium text-neutral-500">Stage</div>
-          <div className="font-medium text-neutral-900">{viewing.stage}</div>
-        </div>
-        <div>
           <div className="text-xs font-medium text-neutral-500">Agent</div>
           {viewing.agent ? (
             <Link
@@ -116,10 +115,10 @@ export default async function ViewingDetailPage({
           </div>
         </div>
         <div>
-          <div className="text-xs font-medium text-neutral-500">Result</div>
+          <div className="text-xs font-medium text-neutral-500">Outcome</div>
           <div className="mt-1">
             {viewing.status === "completed" ? (
-              <ResultBadge result={viewing.result} />
+              <OutcomeBadge outcome={viewing.outcome} />
             ) : (
               <span className="text-xs text-neutral-300">—</span>
             )}
@@ -173,6 +172,7 @@ export default async function ViewingDetailPage({
         >
           <label className="flex items-center gap-2 text-sm">
             <input
+              key={String(viewing.follow_up)}
               type="checkbox"
               name="follow_up"
               defaultChecked={viewing.follow_up}
@@ -184,13 +184,13 @@ export default async function ViewingDetailPage({
         </form>
       </div>
 
-      <div id="result" className="rounded-lg border border-neutral-200 p-5">
-        <h2 className="mb-3 text-sm font-medium">Set result</h2>
+      <div id="outcome" className="rounded-lg border border-neutral-200 p-5">
+        <h2 className="mb-3 text-sm font-medium">Set outcome</h2>
         {viewing.status === "completed" ? (
-          <ResultForm id={id} currentResult={viewing.result} />
+          <OutcomeForm id={id} currentOutcome={viewing.outcome} />
         ) : (
           <p className="text-sm text-neutral-500">
-            Mark this viewing completed to record a result.
+            Mark this viewing completed to record an outcome.
           </p>
         )}
       </div>

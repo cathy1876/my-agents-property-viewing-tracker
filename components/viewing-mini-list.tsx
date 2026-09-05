@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { StatusBadge, ResultBadge } from "@/components/badges";
+import { StatusBadge, OutcomeBadge } from "@/components/badges";
 import type { ViewingWithRelations } from "@/lib/types";
 
 function formatDateTime(iso: string): string {
@@ -38,12 +38,12 @@ export function ViewingMiniList({
               {showClient && showProperty && " · "}
               {showProperty && v.property?.address}
               {(showClient || showProperty) && " · "}
-              {v.stage} · {v.agent?.name || "—"}
+              {v.agent?.name || "—"}
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <StatusBadge status={v.status} />
-            {v.status === "completed" && <ResultBadge result={v.result} />}
+            {v.status === "completed" && <OutcomeBadge outcome={v.outcome} />}
           </div>
         </li>
       ))}

@@ -1,20 +1,18 @@
-export type ViewingStage = "1st" | "2nd" | "3rd";
 export type ViewingStatus = "scheduled" | "completed" | "missed";
-export type ViewingResult =
-  | "not_interested"
-  | "needs_another_viewing"
-  | "interested_ready_to_commit";
+export type ViewingOutcome =
+  | "request_another_viewing"
+  | "ready_to_sign"
+  | "dropped_not_interested";
 
-export const VIEWING_STAGES: ViewingStage[] = ["1st", "2nd", "3rd"];
 export const VIEWING_STATUSES: ViewingStatus[] = [
   "scheduled",
   "completed",
   "missed",
 ];
-export const VIEWING_RESULTS: ViewingResult[] = [
-  "not_interested",
-  "needs_another_viewing",
-  "interested_ready_to_commit",
+export const VIEWING_OUTCOMES: ViewingOutcome[] = [
+  "request_another_viewing",
+  "ready_to_sign",
+  "dropped_not_interested",
 ];
 
 export interface Client {
@@ -52,9 +50,8 @@ export interface Viewing {
   property_id: string;
   agent_id: string | null;
   appointment_at: string;
-  stage: ViewingStage;
   status: ViewingStatus;
-  result: ViewingResult | null;
+  outcome: ViewingOutcome | null;
   notes: string | null;
   result_summary: string | null;
   result_summary_source: string | null;
@@ -73,7 +70,7 @@ export interface ViewingWithRelations extends Viewing {
 export interface ViewingFilters {
   agentId?: string;
   status?: ViewingStatus;
-  result?: ViewingResult;
+  outcome?: ViewingOutcome;
   dateFrom?: string;
   dateTo?: string;
   needsFollowUp?: boolean;

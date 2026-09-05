@@ -3,7 +3,6 @@
 import { useActionState, useState } from "react";
 import { createViewingAction } from "@/lib/actions/viewings";
 import { SubmitButton } from "@/components/submit-button";
-import { VIEWING_STAGES } from "@/lib/types";
 import type { Agent, Client, Property } from "@/lib/types";
 import type { ActionResult } from "@/lib/actions/clients";
 
@@ -156,7 +155,7 @@ export function NewViewingForm({
 
       <fieldset className="space-y-3 rounded-lg border border-neutral-200 p-4">
         <legend className="px-1 text-sm font-medium">Scheduled Date</legend>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           <div className="flex flex-col gap-1">
             <label className="text-xs font-medium text-neutral-500">
               Date *
@@ -178,22 +177,6 @@ export function NewViewingForm({
               required
               className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
             />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-neutral-500">
-              Stage *
-            </label>
-            <select
-              name="stage"
-              defaultValue="1st"
-              className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
-            >
-              {VIEWING_STAGES.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
           </div>
         </div>
         <div className="flex flex-col gap-1">

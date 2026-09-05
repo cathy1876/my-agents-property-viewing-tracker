@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { getViewings } from "@/lib/data/viewings";
 import { getAgents } from "@/lib/data/agents";
-import { StatusBadge, ResultBadge, STATUS_BOX_STYLES } from "@/components/badges";
+import { StatusBadge, OutcomeBadge, STATUS_BOX_STYLES } from "@/components/badges";
 import {
-  VIEWING_RESULTS,
+  VIEWING_OUTCOMES,
   VIEWING_STATUSES,
-  type ViewingResult,
+  type ViewingOutcome,
   type ViewingStatus,
 } from "@/lib/types";
-import { RESULT_LABEL_MAP } from "@/components/badges";
+import { OUTCOME_LABEL_MAP } from "@/components/badges";
 
 export const dynamic = "force-dynamic";
 
@@ -35,22 +35,22 @@ export default async function ViewingsPage({
   const params = await searchParams;
   const agentId = params.agent || undefined;
   const status = (params.status as ViewingStatus) || undefined;
-  const result = (params.result as ViewingResult) || undefined;
+  const outcome = (params.outcome as ViewingOutcome) || undefined;
   const dateFrom = params.dateFrom || undefined;
   const dateTo = params.dateTo || undefined;
   const needsFollowUp = params.followup === "1";
 
   const [viewings, agents] = await Promise.all([
-    getViewings({ agentId, status, result, dateFrom, dateTo, needsFollowUp }),
+    getViewings({ agentId, status, outcome, dateFrom, dateTo, needsFollowUp }),
     getAgents(),
   ]);
 
-  const hasFilters = agentId || status || result || dateFrom || dateTo || needsFollowUp;
+  const hasFilters = agentId || status || outcome || dateFrom || dateTo || needsFollowUp;
 
   const exportQuery = new URLSearchParams();
   if (agentId) exportQuery.set("agent", agentId);
   if (status) exportQuery.set("status", status);
-  if (result) exportQuery.set("result", result);
+  if (outcome) exportQuery.set("outcome", outcome);
   if (dateFrom) exportQuery.set("dateFrom", dateFrom);
   if (dateTo) exportQuery.set("dateTo", dateTo);
   if (needsFollowUp) exportQuery.set("followup", "1");
@@ -107,16 +107,16 @@ export default async function ViewingsPage({
           </select>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-neutral-500">Result</label>
+          <label className="text-xs font-medium text-neutral-500">Outcome</label>
           <select
-            name="result"
-            defaultValue={result || ""}
+            name="outcome"
+            defaultValue={outcome || ""}
             className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
           >
-            <option value="">All results</option>
-            {VIEWING_RESULTS.map((r) => (
-              <option key={r} value={r}>
-                {RESULT_LABEL_MAP[r]}
+            <option value="">All outcomes</option>
+            {VIEWING_OUTCOMES.map((o) => (
+              <option key={o} value={o}>
+                {OUTCOME_LABEL_MAP[o]}
               </option>
             ))}
           </select>
@@ -204,8 +204,6 @@ export default async function ViewingsPage({
                     <dd className="text-neutral-700">
                       {v.property?.address ?? "—"}
                     </dd>
-                    <dt className="text-neutral-500">Stage</dt>
-                    <dd className="text-neutral-700">{v.stage}</dd>
                     <dt className="text-neutral-500">Agent</dt>
                     <dd className="text-neutral-700">{v.agent?.name ?? "—"}</dd>
                     <dt className="text-neutral-500">Agent Code</dt>
@@ -216,10 +214,10 @@ export default async function ViewingsPage({
                     <dd className="text-neutral-700">
                       {v.agent?.agent_email ?? "—"}
                     </dd>
-                    <dt className="text-neutral-500">Result</dt>
+                    <dt className="text-neutral-500">Outcome</dt>
                     <dd>
                       {v.status === "completed" ? (
-                        <ResultBadge result={v.result} />
+                        <OutcomeBadge outcome={v.outcome} />
                       ) : (
                         <span className="text-xs text-neutral-300">—</span>
                       )}
@@ -253,9 +251,6 @@ export default async function ViewingsPage({
                     Property
                   </th>
                   <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
-                    Stage
-                  </th>
-                  <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
                     Agent
                   </th>
                   <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
@@ -268,7 +263,7 @@ export default async function ViewingsPage({
                     Status
                   </th>
                   <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
-                    Result
+                    Outcome
                   </th>
                   <th className="px-4 py-2.5 text-left font-medium text-neutral-500">
                     Follow-up
@@ -292,7 +287,6 @@ export default async function ViewingsPage({
                     <td className="px-4 py-3 text-neutral-700">
                       {v.property?.address ?? "—"}
                     </td>
-                    <td className="px-4 py-3 text-neutral-700">{v.stage}</td>
                     <td className="px-4 py-3 text-neutral-700">
                       {v.agent?.name ?? "—"}
                     </td>
@@ -307,7 +301,7 @@ export default async function ViewingsPage({
                     </td>
                     <td className="px-4 py-3">
                       {v.status === "completed" ? (
-                        <ResultBadge result={v.result} />
+                        <OutcomeBadge outcome={v.outcome} />
                       ) : (
                         <span className="text-xs text-neutral-300">—</span>
                       )}

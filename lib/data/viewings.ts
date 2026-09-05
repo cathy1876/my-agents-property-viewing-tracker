@@ -2,8 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import type {
   Viewing,
   ViewingFilters,
-  ViewingResult,
-  ViewingStage,
+  ViewingOutcome,
   ViewingStatus,
   ViewingWithRelations,
 } from "@/lib/types";
@@ -16,7 +15,6 @@ export interface ViewingInput {
   property_id: string;
   agent_id: string;
   appointment_at: string;
-  stage: ViewingStage;
   notes?: string | null;
 }
 
@@ -35,8 +33,8 @@ export async function getViewings(
   if (filters.status) {
     query = query.eq("status", filters.status);
   }
-  if (filters.result) {
-    query = query.eq("result", filters.result);
+  if (filters.outcome) {
+    query = query.eq("outcome", filters.outcome);
   }
   if (filters.dateFrom) {
     query = query.gte("appointment_at", filters.dateFrom);
@@ -107,7 +105,6 @@ export async function createViewingRecord(
       property_id: input.property_id,
       agent_id: input.agent_id,
       appointment_at: input.appointment_at,
-      stage: input.stage,
       notes: input.notes || null,
       status: "scheduled",
     })
@@ -130,7 +127,6 @@ export async function updateViewingRecord(
       property_id: input.property_id,
       agent_id: input.agent_id,
       appointment_at: input.appointment_at,
-      stage: input.stage,
       notes: input.notes || null,
     })
     .eq("id", id)
@@ -146,10 +142,10 @@ export async function updateViewingStatus(
   status: ViewingStatus,
 ): Promise<Viewing> {
   const supabase = await createClient();
-  const updates: { status: ViewingStatus; result?: null } = { status };
-  // Reopening to scheduled clears any previously recorded result.
+  const updates: { status: ViewingStatus; outcome?: null } = { status };
+  // Reopening to scheduled clears any previously recorded outcome.
   if (status === "scheduled" || status === "missed") {
-    updates.result = null;
+    updates.outcome = null;
   }
   const { data, error } = await supabase
     .from("viewings")
@@ -162,14 +158,24 @@ export async function updateViewingStatus(
   return data;
 }
 
-export async function updateViewingResult(
+export async function updateViewingOutcome(
   id: string,
-  result: ViewingResult,
+  outcome: ViewingOutcome,
 ): Promise<Viewing> {
   const supabase = await createClient();
+  const updates: { outcome: ViewingOutcome; status: "completed"; follow_up?: true } = {
+    outcome,
+    status: "completed",
+  };
+  // Sensible default, not a hard rule: requesting another viewing usually
+  // means follow-up is needed. The admin/agent can still uncheck it
+  // separately via the follow-up control; other outcomes never touch it.
+  if (outcome === "request_another_viewing") {
+    updates.follow_up = true;
+  }
   const { data, error } = await supabase
     .from("viewings")
-    .update({ result, status: "completed" })
+    .update(updates)
     .eq("id", id)
     .select("*")
     .single();
