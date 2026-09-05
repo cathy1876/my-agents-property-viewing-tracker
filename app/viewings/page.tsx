@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getViewings, getDisplayStatus } from "@/lib/data/viewings";
 import { getAgents } from "@/lib/data/agents";
 import { StatusBadge, OutcomeBadge, STATUS_BOX_STYLES } from "@/components/badges";
+import { FormattedDateTime } from "@/components/formatted-date-time";
 import {
   VIEWING_OUTCOMES,
   VIEWING_STATUSES,
@@ -18,13 +19,6 @@ function FollowUpMarker() {
       ⚑ Needs follow-up
     </span>
   );
-}
-
-function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString("en-ZA", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
 }
 
 export default async function ViewingsPage({
@@ -193,7 +187,11 @@ export default async function ViewingsPage({
                 >
                   <div className="mb-2 flex items-start justify-between gap-2">
                     <span className="font-medium text-neutral-900">
-                      {formatDateTime(v.appointment_at)}
+                      <FormattedDateTime
+                        iso={v.appointment_at}
+                        dateStyle="medium"
+                        timeStyle="short"
+                      />
                     </span>
                     <StatusBadge status={getDisplayStatus(v)} />
                   </div>
@@ -278,7 +276,11 @@ export default async function ViewingsPage({
                         href={`/viewings/${v.id}`}
                         className="font-medium text-neutral-900 hover:underline"
                       >
-                        {formatDateTime(v.appointment_at)}
+                        <FormattedDateTime
+                          iso={v.appointment_at}
+                          dateStyle="medium"
+                          timeStyle="short"
+                        />
                       </Link>
                     </td>
                     <td className="px-4 py-3 text-neutral-700">

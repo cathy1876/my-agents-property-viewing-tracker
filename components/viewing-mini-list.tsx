@@ -1,14 +1,8 @@
 import Link from "next/link";
 import { StatusBadge, OutcomeBadge } from "@/components/badges";
+import { FormattedDateTime } from "@/components/formatted-date-time";
 import { getDisplayStatus } from "@/lib/data/viewings";
 import type { ViewingWithRelations } from "@/lib/types";
-
-function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString("en-ZA", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-}
 
 export function ViewingMiniList({
   viewings,
@@ -32,7 +26,11 @@ export function ViewingMiniList({
               href={`/viewings/${v.id}`}
               className="font-medium text-neutral-900 hover:underline"
             >
-              {formatDateTime(v.appointment_at)}
+              <FormattedDateTime
+                iso={v.appointment_at}
+                dateStyle="medium"
+                timeStyle="short"
+              />
             </Link>
             <div className="truncate text-sm text-neutral-500">
               {showClient && v.client?.name}

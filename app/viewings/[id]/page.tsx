@@ -9,14 +9,8 @@ import {
   setViewingStatusAction,
 } from "@/lib/actions/viewings";
 import { SubmitButton } from "@/components/submit-button";
+import { FormattedDateTime } from "@/components/formatted-date-time";
 import { OutcomeForm } from "./outcome-form";
-
-function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString("en-ZA", {
-    dateStyle: "full",
-    timeStyle: "short",
-  });
-}
 
 export default async function ViewingDetailPage({
   params,
@@ -38,7 +32,11 @@ export default async function ViewingDetailPage({
             Scheduled Date
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            {formatDateTime(viewing.appointment_at)}
+            <FormattedDateTime
+              iso={viewing.appointment_at}
+              dateStyle="full"
+              timeStyle="short"
+            />
           </h1>
         </div>
         <div className="flex items-center gap-3">
