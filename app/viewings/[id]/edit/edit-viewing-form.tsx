@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { updateViewingAction } from "@/lib/actions/viewings";
 import { SubmitButton } from "@/components/submit-button";
 import type { Agent, Client, Property, ViewingWithRelations } from "@/lib/types";
@@ -33,6 +33,22 @@ export function EditViewingForm({
 }) {
   const action = updateViewingAction.bind(null, viewing.id);
   const [state, formAction] = useActionState(action, initialState);
+  const [appointmentDate, setAppointmentDate] = useState(
+    toDateInput(viewing.appointment_at),
+  );
+  const [appointmentTime, setAppointmentTime] = useState(
+    toTimeInput(viewing.appointment_at),
+  );
+
+  // Combine in the browser, where the visitor's real local timezone is
+  // known, then submit the resulting UTC instant directly.
+  let appointmentAtUtc = "";
+  if (appointmentDate && appointmentTime) {
+    const local = new Date(`${appointmentDate}T${appointmentTime}`);
+    if (!Number.isNaN(local.getTime())) {
+      appointmentAtUtc = local.toISOString();
+    }
+  }
 
   return (
     <form action={formAction} className="space-y-6">
@@ -79,9 +95,9 @@ export function EditViewingForm({
           <label className="text-xs font-medium text-neutral-500">Date *</label>
           <input
             type="date"
-            name="appointment_date"
+            value={appointmentDate}
+            onChange={(e) => setAppointmentDate(e.target.value)}
             required
-            defaultValue={toDateInput(viewing.appointment_at)}
             className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
           />
         </div>
@@ -89,12 +105,13 @@ export function EditViewingForm({
           <label className="text-xs font-medium text-neutral-500">Time *</label>
           <input
             type="time"
-            name="appointment_time"
+            value={appointmentTime}
+            onChange={(e) => setAppointmentTime(e.target.value)}
             required
-            defaultValue={toTimeInput(viewing.appointment_at)}
             className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
           />
         </div>
+        <input type="hidden" name="appointment_at" value={appointmentAtUtc} />
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-neutral-500">Agent *</label>
           <select

@@ -24,6 +24,20 @@ export function NewViewingForm({
   const [propertyMode, setPropertyMode] = useState<"existing" | "new">(
     properties.length === 0 ? "new" : "existing",
   );
+  const [appointmentDate, setAppointmentDate] = useState("");
+  const [appointmentTime, setAppointmentTime] = useState("");
+
+  // Combine in the browser, where the visitor's real local timezone is
+  // known, then submit the resulting UTC instant directly - a server
+  // action can't do this conversion correctly, since it always runs in
+  // the server's own timezone (UTC on Vercel), not the visitor's.
+  let appointmentAtUtc = "";
+  if (appointmentDate && appointmentTime) {
+    const local = new Date(`${appointmentDate}T${appointmentTime}`);
+    if (!Number.isNaN(local.getTime())) {
+      appointmentAtUtc = local.toISOString();
+    }
+  }
 
   return (
     <form action={formAction} className="space-y-6">
@@ -162,7 +176,8 @@ export function NewViewingForm({
             </label>
             <input
               type="date"
-              name="appointment_date"
+              value={appointmentDate}
+              onChange={(e) => setAppointmentDate(e.target.value)}
               required
               className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
             />
@@ -173,11 +188,13 @@ export function NewViewingForm({
             </label>
             <input
               type="time"
-              name="appointment_time"
+              value={appointmentTime}
+              onChange={(e) => setAppointmentTime(e.target.value)}
               required
               className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
             />
           </div>
+          <input type="hidden" name="appointment_at" value={appointmentAtUtc} />
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-neutral-500">

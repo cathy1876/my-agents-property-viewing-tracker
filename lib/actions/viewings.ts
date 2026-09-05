@@ -15,11 +15,17 @@ import {
 import type { ViewingOutcome, ViewingStatus } from "@/lib/types";
 import type { ActionResult } from "@/lib/actions/clients";
 
-function toTimestamp(date: string, time: string): string | null {
-  if (!date || !time) return null;
-  const iso = new Date(`${date}T${time}`);
-  if (Number.isNaN(iso.getTime())) return null;
-  return iso.toISOString();
+// The browser computes this (see appointment_at hidden field in the
+// viewing forms) using its own local timezone - a server action can't do
+// that conversion correctly, since it always runs in the server's own
+// timezone (UTC on Vercel), not the visitor's. This just validates the
+// already-converted value.
+function parseAppointmentAt(value: FormDataEntryValue | null): string | null {
+  const raw = String(value || "");
+  if (!raw) return null;
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed.toISOString();
 }
 
 async function resolveClientId(
@@ -64,15 +70,13 @@ export async function createViewingAction(
   _prev: ActionResult,
   formData: FormData,
 ): Promise<ActionResult> {
-  const date = String(formData.get("appointment_date") || "");
-  const time = String(formData.get("appointment_time") || "");
   const agentId = String(formData.get("agent_id") || "").trim();
 
   if (!agentId) {
     return { success: false, error: "Agent is required." };
   }
 
-  const appointmentAt = toTimestamp(date, time);
+  const appointmentAt = parseAppointmentAt(formData.get("appointment_at"));
   if (!appointmentAt) {
     return {
       success: false,
@@ -112,8 +116,6 @@ export async function updateViewingAction(
   _prev: ActionResult,
   formData: FormData,
 ): Promise<ActionResult> {
-  const date = String(formData.get("appointment_date") || "");
-  const time = String(formData.get("appointment_time") || "");
   const agentId = String(formData.get("agent_id") || "").trim();
   const clientId = String(formData.get("client_id") || "").trim();
   const propertyId = String(formData.get("property_id") || "").trim();
@@ -122,7 +124,7 @@ export async function updateViewingAction(
   if (!clientId || !propertyId)
     return { success: false, error: "Client and property are required." };
 
-  const appointmentAt = toTimestamp(date, time);
+  const appointmentAt = parseAppointmentAt(formData.get("appointment_at"));
   if (!appointmentAt) {
     return {
       success: false,
