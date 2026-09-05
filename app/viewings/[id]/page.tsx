@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getViewing } from "@/lib/data/viewings";
+import { getDisplayStatus, getViewing } from "@/lib/data/viewings";
 import { StatusBadge, OutcomeBadge } from "@/components/badges";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import {
@@ -111,7 +111,7 @@ export default async function ViewingDetailPage({
         <div>
           <div className="text-xs font-medium text-neutral-500">Status</div>
           <div className="mt-1">
-            <StatusBadge status={viewing.status} />
+            <StatusBadge status={getDisplayStatus(viewing)} />
           </div>
         </div>
         <div>

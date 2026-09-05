@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { StatusBadge, OutcomeBadge } from "@/components/badges";
+import { getDisplayStatus } from "@/lib/data/viewings";
 import type { ViewingWithRelations } from "@/lib/types";
 
 function formatDateTime(iso: string): string {
@@ -42,7 +43,7 @@ export function ViewingMiniList({
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <StatusBadge status={v.status} />
+            <StatusBadge status={getDisplayStatus(v)} />
             {v.status === "completed" && <OutcomeBadge outcome={v.outcome} />}
           </div>
         </li>

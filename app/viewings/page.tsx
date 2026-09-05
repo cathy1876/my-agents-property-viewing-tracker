@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getViewings } from "@/lib/data/viewings";
+import { getViewings, getDisplayStatus } from "@/lib/data/viewings";
 import { getAgents } from "@/lib/data/agents";
 import { StatusBadge, OutcomeBadge, STATUS_BOX_STYLES } from "@/components/badges";
 import {
@@ -189,13 +189,13 @@ export default async function ViewingsPage({
               <li key={v.id}>
                 <Link
                   href={`/viewings/${v.id}`}
-                  className={`block rounded-lg border p-4 ${STATUS_BOX_STYLES[v.status]}`}
+                  className={`block rounded-lg border p-4 ${STATUS_BOX_STYLES[getDisplayStatus(v)]}`}
                 >
                   <div className="mb-2 flex items-start justify-between gap-2">
                     <span className="font-medium text-neutral-900">
                       {formatDateTime(v.appointment_at)}
                     </span>
-                    <StatusBadge status={v.status} />
+                    <StatusBadge status={getDisplayStatus(v)} />
                   </div>
                   <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
                     <dt className="text-neutral-500">Client</dt>
@@ -272,7 +272,7 @@ export default async function ViewingsPage({
               </thead>
               <tbody className="divide-y divide-neutral-100">
                 {viewings.map((v) => (
-                  <tr key={v.id} className={STATUS_BOX_STYLES[v.status]}>
+                  <tr key={v.id} className={STATUS_BOX_STYLES[getDisplayStatus(v)]}>
                     <td className="px-4 py-3">
                       <Link
                         href={`/viewings/${v.id}`}
@@ -297,7 +297,7 @@ export default async function ViewingsPage({
                       {v.agent?.agent_email ?? "—"}
                     </td>
                     <td className="px-4 py-3">
-                      <StatusBadge status={v.status} />
+                      <StatusBadge status={getDisplayStatus(v)} />
                     </td>
                     <td className="px-4 py-3">
                       {v.status === "completed" ? (

@@ -18,6 +18,20 @@ export interface ViewingInput {
   notes?: string | null;
 }
 
+// Display-only: a "scheduled" viewing whose appointment_at has passed reads
+// as "missed" everywhere it's shown, without writing anything to the DB.
+// The stored status stays "scheduled" until someone explicitly clicks
+// "Mark Missed" (or "Mark Completed") - that button intentionally stays
+// enabled so the admin can still commit it on record.
+export function getDisplayStatus(
+  v: Pick<Viewing, "status" | "appointment_at">,
+): ViewingStatus {
+  if (v.status === "scheduled" && new Date(v.appointment_at).getTime() < Date.now()) {
+    return "missed";
+  }
+  return v.status;
+}
+
 export async function getViewings(
   filters: ViewingFilters = {},
 ): Promise<ViewingWithRelations[]> {
@@ -29,9 +43,6 @@ export async function getViewings(
 
   if (filters.agentId) {
     query = query.eq("agent_id", filters.agentId);
-  }
-  if (filters.status) {
-    query = query.eq("status", filters.status);
   }
   if (filters.outcome) {
     query = query.eq("outcome", filters.outcome);
@@ -49,7 +60,15 @@ export async function getViewings(
   const { data, error } = await query;
   if (error) throw new Error(error.message);
 
-  return (data ?? []) as unknown as ViewingWithRelations[];
+  let rows = (data ?? []) as unknown as ViewingWithRelations[];
+
+  // Status filter runs after the fetch so it matches on the *displayed*
+  // status (e.g. "Missed" includes overdue-but-still-scheduled rows).
+  if (filters.status) {
+    rows = rows.filter((v) => getDisplayStatus(v) === filters.status);
+  }
+
+  return rows;
 }
 
 export async function getViewingsForClient(

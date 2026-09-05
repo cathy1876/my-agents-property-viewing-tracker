@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getViewings } from "@/lib/data/viewings";
+import { getDisplayStatus, getViewings } from "@/lib/data/viewings";
 import type { ViewingOutcome, ViewingStatus } from "@/lib/types";
 
 function csvEscape(value: string): string {
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     v.agent?.name ?? "",
     v.agent?.agent_code ?? "",
     v.agent?.agent_email ?? "",
-    v.status,
+    getDisplayStatus(v),
     v.outcome ?? "",
     v.follow_up ? "Yes" : "No",
     v.notes ?? "",
