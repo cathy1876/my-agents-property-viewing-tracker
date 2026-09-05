@@ -9,8 +9,27 @@ function csvEscape(value: string): string {
   return value;
 }
 
+function formatLocal(iso: string, timeZone: string): string {
+  try {
+    return new Date(iso).toLocaleString("en-ZA", {
+      dateStyle: "medium",
+      timeStyle: "short",
+      timeZone,
+    });
+  } catch {
+    // Invalid/unrecognized IANA zone (e.g. a malformed tz param) - fall
+    // back to UTC rather than letting the whole export fail.
+    return new Date(iso).toLocaleString("en-ZA", {
+      dateStyle: "medium",
+      timeStyle: "short",
+      timeZone: "UTC",
+    });
+  }
+}
+
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
+  const timeZone = params.get("tz") || "UTC";
 
   const viewings = await getViewings({
     agentId: params.get("agent") || undefined,
@@ -36,7 +55,7 @@ export async function GET(request: NextRequest) {
   ];
 
   const rows = viewings.map((v) => [
-    new Date(v.appointment_at).toISOString(),
+    formatLocal(v.appointment_at, timeZone),
     v.client?.name ?? "",
     v.client?.phone ?? "",
     v.property?.address ?? "",

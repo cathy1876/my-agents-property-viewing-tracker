@@ -3,6 +3,7 @@ import { getViewings, getDisplayStatus } from "@/lib/data/viewings";
 import { getAgents } from "@/lib/data/agents";
 import { StatusBadge, OutcomeBadge, STATUS_BOX_STYLES } from "@/components/badges";
 import { FormattedDateTime } from "@/components/formatted-date-time";
+import { ExportCsvLink } from "@/components/export-csv-link";
 import {
   VIEWING_OUTCOMES,
   VIEWING_STATUSES,
@@ -54,12 +55,7 @@ export default async function ViewingsPage({
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold tracking-tight">Viewings</h1>
         <div className="flex gap-2">
-          <a
-            href={`/viewings/export?${exportQuery.toString()}`}
-            className="inline-flex items-center rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
-          >
-            Export CSV
-          </a>
+          <ExportCsvLink baseHref={`/viewings/export?${exportQuery.toString()}`} />
           <Link
             href="/viewings/new"
             className="inline-flex items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:opacity-90"
