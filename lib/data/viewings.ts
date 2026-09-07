@@ -20,9 +20,9 @@ export interface ViewingInput {
 
 // Display-only: a "scheduled" viewing whose appointment_at has passed reads
 // as "missed" everywhere it's shown, without writing anything to the DB.
-// The stored status stays "scheduled" until someone explicitly clicks
-// "Mark Missed" (or "Mark Completed") - that button intentionally stays
-// enabled so the admin can still commit it on record.
+// There's no manual "Mark Missed" action - the stored status only ever
+// becomes "completed" (via recording an outcome); "missed" is purely
+// computed here, never persisted.
 export function getDisplayStatus(
   v: Pick<Viewing, "status" | "appointment_at">,
 ): ViewingStatus {
@@ -156,61 +156,20 @@ export async function updateViewingRecord(
   return data;
 }
 
-export async function updateViewingStatus(
-  id: string,
-  status: ViewingStatus,
-): Promise<Viewing> {
-  const supabase = await createClient();
-  const updates: { status: ViewingStatus; outcome?: null } = { status };
-  // Reopening to scheduled clears any previously recorded outcome.
-  if (status === "scheduled" || status === "missed") {
-    updates.outcome = null;
-  }
-  const { data, error } = await supabase
-    .from("viewings")
-    .update(updates)
-    .eq("id", id)
-    .select("*")
-    .single();
-
-  if (error) throw new Error(error.message);
-  return data;
-}
-
+// Selecting an outcome is the single action that both marks the viewing
+// completed and records the outcome - there's no separate "mark completed"
+// step. followUp is whatever the admin/agent submitted; any "request
+// another viewing implies follow-up" default is applied client-side as a
+// pre-filled suggestion, not enforced here.
 export async function updateViewingOutcome(
   id: string,
   outcome: ViewingOutcome,
-): Promise<Viewing> {
-  const supabase = await createClient();
-  const updates: { outcome: ViewingOutcome; status: "completed"; follow_up?: true } = {
-    outcome,
-    status: "completed",
-  };
-  // Sensible default, not a hard rule: requesting another viewing usually
-  // means follow-up is needed. The admin/agent can still uncheck it
-  // separately via the follow-up control; other outcomes never touch it.
-  if (outcome === "request_another_viewing") {
-    updates.follow_up = true;
-  }
-  const { data, error } = await supabase
-    .from("viewings")
-    .update(updates)
-    .eq("id", id)
-    .select("*")
-    .single();
-
-  if (error) throw new Error(error.message);
-  return data;
-}
-
-export async function updateViewingFollowUp(
-  id: string,
   followUp: boolean,
 ): Promise<Viewing> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("viewings")
-    .update({ follow_up: followUp })
+    .update({ outcome, status: "completed", follow_up: followUp })
     .eq("id", id)
     .select("*")
     .single();

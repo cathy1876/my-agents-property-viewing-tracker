@@ -3,26 +3,27 @@ import { notFound } from "next/navigation";
 import { getDisplayStatus, getViewing } from "@/lib/data/viewings";
 import { StatusBadge, OutcomeBadge } from "@/components/badges";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
-import {
-  deleteViewingAction,
-  setViewingFollowUpAction,
-  setViewingStatusAction,
-} from "@/lib/actions/viewings";
-import { SubmitButton } from "@/components/submit-button";
+import { deleteViewingAction } from "@/lib/actions/viewings";
 import { FormattedDateTime } from "@/components/formatted-date-time";
-import { OutcomeForm } from "./outcome-form";
+import { FlashBanner } from "@/components/flash-banner";
+import { UpdateForm } from "./update-form";
 
 export default async function ViewingDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ updated?: string }>;
 }) {
   const { id } = await params;
+  const { updated } = await searchParams;
   const viewing = await getViewing(id);
   if (!viewing) notFound();
 
   return (
     <div className="mx-auto max-w-2xl">
+      <FlashBanner param={updated ? "updated" : undefined} pathname={`/viewings/${id}`} />
+
       <div className="mb-6 flex items-center justify-between">
         <div>
           <Link href="/viewings" className="text-sm text-neutral-500 hover:underline">
@@ -132,65 +133,17 @@ export default async function ViewingDetailPage({
         )}
       </div>
 
-      <div className="mb-6 rounded-lg border border-neutral-200 p-5">
-        <h2 className="mb-3 text-sm font-medium">Update status</h2>
-        <div className="flex flex-wrap gap-2">
-          <form action={setViewingStatusAction.bind(null, id, "completed")}>
-            <button
-              type="submit"
-              disabled={viewing.status === "completed"}
-              className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-40"
-            >
-              Mark Completed
-            </button>
-          </form>
-          <form action={setViewingStatusAction.bind(null, id, "missed")}>
-            <button
-              type="submit"
-              disabled={viewing.status === "missed"}
-              className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-40"
-            >
-              Mark Missed
-            </button>
-          </form>
-          <form action={setViewingStatusAction.bind(null, id, "scheduled")}>
-            <button
-              type="submit"
-              disabled={viewing.status === "scheduled"}
-              className="rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium hover:bg-neutral-50 disabled:opacity-40"
-            >
-              Reopen (Scheduled)
-            </button>
-          </form>
-        </div>
-
-        <form
-          action={setViewingFollowUpAction.bind(null, id)}
-          className="mt-4 flex items-center gap-3 border-t border-neutral-200 pt-4"
-        >
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              key={String(viewing.follow_up)}
-              type="checkbox"
-              name="follow_up"
-              defaultChecked={viewing.follow_up}
-              className="rounded border-neutral-300"
-            />
-            Needs follow-up
-          </label>
-          <SubmitButton className="px-3 py-1.5">Save</SubmitButton>
-        </form>
-      </div>
-
-      <div id="outcome" className="rounded-lg border border-neutral-200 p-5">
-        <h2 className="mb-3 text-sm font-medium">Set outcome</h2>
-        {viewing.status === "completed" ? (
-          <OutcomeForm id={id} currentOutcome={viewing.outcome} />
-        ) : (
-          <p className="text-sm text-neutral-500">
-            Mark this viewing completed to record an outcome.
-          </p>
-        )}
+      <div className="rounded-lg border border-neutral-200 p-5">
+        <h2 className="mb-1 text-sm font-medium">Update</h2>
+        <p className="mb-3 text-sm text-neutral-500">
+          Selecting an outcome marks this viewing completed and records the
+          outcome in one step.
+        </p>
+        <UpdateForm
+          id={id}
+          currentOutcome={viewing.outcome}
+          currentFollowUp={viewing.follow_up}
+        />
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { getAgents } from "@/lib/data/agents";
 import { StatusBadge, OutcomeBadge, STATUS_BOX_STYLES } from "@/components/badges";
 import { FormattedDateTime } from "@/components/formatted-date-time";
 import { ExportCsvLink } from "@/components/export-csv-link";
+import { FlashBanner } from "@/components/flash-banner";
 import {
   VIEWING_OUTCOMES,
   VIEWING_STATUSES,
@@ -34,6 +35,7 @@ export default async function ViewingsPage({
   const dateFrom = params.dateFrom || undefined;
   const dateTo = params.dateTo || undefined;
   const needsFollowUp = params.followup === "1";
+  const flashParam = params.created ? "created" : params.deleted ? "deleted" : undefined;
 
   const [viewings, agents] = await Promise.all([
     getViewings({ agentId, status, outcome, dateFrom, dateTo, needsFollowUp }),
@@ -52,6 +54,8 @@ export default async function ViewingsPage({
 
   return (
     <div className="mx-auto max-w-6xl">
+      <FlashBanner param={flashParam} pathname="/viewings" />
+
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold tracking-tight">Viewings</h1>
         <div className="flex gap-2">

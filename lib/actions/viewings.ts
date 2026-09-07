@@ -7,12 +7,10 @@ import { createPropertyRecord } from "@/lib/data/properties";
 import {
   createViewingRecord,
   deleteViewingRecord,
-  updateViewingFollowUp,
   updateViewingOutcome,
   updateViewingRecord,
-  updateViewingStatus,
 } from "@/lib/data/viewings";
-import type { ViewingOutcome, ViewingStatus } from "@/lib/types";
+import type { ViewingOutcome } from "@/lib/types";
 import type { ActionResult } from "@/lib/actions/clients";
 
 // The browser computes this (see appointment_at hidden field in the
@@ -108,7 +106,7 @@ export async function createViewingAction(
   revalidatePath("/viewings");
   revalidatePath("/clients");
   revalidatePath("/properties");
-  redirect(`/viewings/${viewingId}`);
+  redirect("/viewings?created=1");
 }
 
 export async function updateViewingAction(
@@ -145,39 +143,32 @@ export async function updateViewingAction(
   }
   revalidatePath("/viewings");
   revalidatePath(`/viewings/${id}`);
-  redirect(`/viewings/${id}`);
+  redirect(`/viewings/${id}?updated=1`);
 }
 
-export async function setViewingStatusAction(
+export async function submitViewingUpdateAction(
   id: string,
-  status: ViewingStatus,
-): Promise<void> {
-  await updateViewingStatus(id, status);
-  revalidatePath("/viewings");
-  revalidatePath(`/viewings/${id}`);
-}
-
-export async function setViewingOutcomeAction(
-  id: string,
-  outcome: ViewingOutcome,
-): Promise<void> {
-  await updateViewingOutcome(id, outcome);
-  revalidatePath("/viewings");
-  revalidatePath(`/viewings/${id}`);
-}
-
-export async function setViewingFollowUpAction(
-  id: string,
+  _prev: ActionResult,
   formData: FormData,
-): Promise<void> {
+): Promise<ActionResult> {
+  const outcome = String(formData.get("outcome") || "") as ViewingOutcome | "";
+  if (!outcome) {
+    return { success: false, error: "Please select an outcome." };
+  }
   const followUp = formData.get("follow_up") === "on";
-  await updateViewingFollowUp(id, followUp);
+
+  try {
+    await updateViewingOutcome(id, outcome, followUp);
+  } catch (err) {
+    return { success: false, error: (err as Error).message };
+  }
   revalidatePath("/viewings");
   revalidatePath(`/viewings/${id}`);
+  return { success: true };
 }
 
 export async function deleteViewingAction(id: string): Promise<void> {
   await deleteViewingRecord(id);
   revalidatePath("/viewings");
-  redirect("/viewings");
+  redirect("/viewings?deleted=1");
 }

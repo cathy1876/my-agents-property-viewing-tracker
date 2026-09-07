@@ -51,7 +51,15 @@ export function EditViewingForm({
   }
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form
+      action={formAction}
+      onSubmit={(e) => {
+        if (!confirm("Save these changes to the viewing?")) {
+          e.preventDefault();
+        }
+      }}
+      className="space-y-6"
+    >
       {state.success === false && state.error && (
         <div className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
           {state.error}
