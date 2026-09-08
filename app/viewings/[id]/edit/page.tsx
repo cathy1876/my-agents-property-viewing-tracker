@@ -5,6 +5,8 @@ import { getProperties } from "@/lib/data/properties";
 import { getAgents } from "@/lib/data/agents";
 import { EditViewingForm } from "./edit-viewing-form";
 
+export const dynamic = "force-dynamic";
+
 export default async function EditViewingPage({
   params,
 }: {

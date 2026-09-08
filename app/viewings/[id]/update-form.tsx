@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef } from "react";
 import { submitViewingUpdateAction } from "@/lib/actions/viewings";
 import { SubmitButton } from "@/components/submit-button";
 import { VIEWING_OUTCOMES, type ViewingOutcome } from "@/lib/types";
@@ -23,9 +23,16 @@ export function UpdateForm({
 }) {
   const action = submitViewingUpdateAction.bind(null, id);
   const [state, formAction] = useActionState(action, initialState);
-  const [outcome, setOutcome] = useState<ViewingOutcome | "">(currentOutcome ?? "");
-  const [followUp, setFollowUp] = useState(currentFollowUp);
+  const followUpRef = useRef<HTMLInputElement>(null);
 
+  // Outcome/follow-up are uncontrolled (defaultValue/defaultChecked), not
+  // React-controlled state. React 19 automatically resets <form> fields
+  // after a Server Action completes successfully - with controlled fields,
+  // that native reset visibly flashes to blank/unchecked for a frame before
+  // React's next render corrects it. Uncontrolled fields are immune to
+  // that race; keying each field (not the whole form, which would also
+  // wipe useActionState's own success/error state) on the fresh server
+  // value re-syncs them once revalidatePath's new data arrives.
   return (
     <form
       action={formAction}
@@ -52,14 +59,13 @@ export function UpdateForm({
           Outcome *
         </label>
         <select
+          key={currentOutcome ?? "none"}
           name="outcome"
           required
-          value={outcome}
+          defaultValue={currentOutcome ?? ""}
           onChange={(e) => {
-            const value = e.target.value as ViewingOutcome;
-            setOutcome(value);
-            if (value === "request_another_viewing") {
-              setFollowUp(true);
+            if (e.target.value === "request_another_viewing" && followUpRef.current) {
+              followUpRef.current.checked = true;
             }
           }}
           className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
@@ -77,10 +83,11 @@ export function UpdateForm({
 
       <label className="flex items-center gap-2 text-sm">
         <input
+          key={String(currentFollowUp)}
+          ref={followUpRef}
           type="checkbox"
           name="follow_up"
-          checked={followUp}
-          onChange={(e) => setFollowUp(e.target.checked)}
+          defaultChecked={currentFollowUp}
           className="rounded border-neutral-300"
         />
         Needs follow-up

@@ -8,6 +8,8 @@ import { FormattedDateTime } from "@/components/formatted-date-time";
 import { FlashBanner } from "@/components/flash-banner";
 import { UpdateForm } from "./update-form";
 
+export const dynamic = "force-dynamic";
+
 export default async function ViewingDetailPage({
   params,
   searchParams,
