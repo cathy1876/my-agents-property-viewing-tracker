@@ -24,6 +24,15 @@ export function UpdateForm({
   const action = submitViewingUpdateAction.bind(null, id);
   const [state, formAction] = useActionState(action, initialState);
   const followUpRef = useRef<HTMLInputElement>(null);
+  // Tracks whether the admin/agent has manually touched the checkbox
+  // themselves in this form session. Until they do, the checkbox is a pure
+  // reflection of the currently-selected outcome (checked while "request
+  // another viewing" is selected, reverting to the stored value otherwise)
+  // - selecting an outcome, changing your mind, then submitting a different
+  // one must not leave a stale forced-check behind from an earlier,
+  // abandoned selection. Once manually touched, their choice always wins,
+  // regardless of further outcome changes.
+  const followUpTouched = useRef(false);
 
   // Outcome/follow-up are uncontrolled (defaultValue/defaultChecked), not
   // React-controlled state. React 19 automatically resets <form> fields
@@ -64,9 +73,9 @@ export function UpdateForm({
           required
           defaultValue={currentOutcome ?? ""}
           onChange={(e) => {
-            if (e.target.value === "request_another_viewing" && followUpRef.current) {
-              followUpRef.current.checked = true;
-            }
+            if (followUpTouched.current || !followUpRef.current) return;
+            followUpRef.current.checked =
+              e.target.value === "request_another_viewing" ? true : currentFollowUp;
           }}
           className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
         >
@@ -88,6 +97,9 @@ export function UpdateForm({
           type="checkbox"
           name="follow_up"
           defaultChecked={currentFollowUp}
+          onChange={() => {
+            followUpTouched.current = true;
+          }}
           className="rounded border-neutral-300"
         />
         Needs follow-up
