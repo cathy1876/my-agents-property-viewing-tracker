@@ -143,7 +143,7 @@ export async function updateViewingAction(
   }
   revalidatePath("/viewings");
   revalidatePath(`/viewings/${id}`);
-  redirect(`/viewings/${id}?updated=1`);
+  redirect("/viewings?edited=1");
 }
 
 export async function submitViewingUpdateAction(
@@ -164,7 +164,7 @@ export async function submitViewingUpdateAction(
   }
   revalidatePath("/viewings");
   revalidatePath(`/viewings/${id}`);
-  return { success: true };
+  redirect("/viewings?updated=1");
 }
 
 export async function deleteViewingAction(id: string): Promise<void> {

@@ -7,9 +7,6 @@ import { VIEWING_OUTCOMES, type ViewingOutcome } from "@/lib/types";
 import { OUTCOME_LABEL_MAP } from "@/components/badges";
 import type { ActionResult } from "@/lib/actions/clients";
 
-// Starts neither succeeded nor errored, unlike other forms in this app -
-// this one doesn't redirect on success, so { success: true } as a starting
-// sentinel would show "updated successfully" before any submission.
 const initialState: ActionResult = { success: false };
 
 export function UpdateForm({
@@ -55,11 +52,6 @@ export function UpdateForm({
       {state.success === false && state.error && (
         <div className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
           {state.error}
-        </div>
-      )}
-      {state.success === true && (
-        <div className="rounded-md border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-800">
-          Viewing updated successfully.
         </div>
       )}
 

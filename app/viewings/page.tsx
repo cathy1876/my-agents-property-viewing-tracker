@@ -35,7 +35,15 @@ export default async function ViewingsPage({
   const dateFrom = params.dateFrom || undefined;
   const dateTo = params.dateTo || undefined;
   const needsFollowUp = params.followup === "1";
-  const flashParam = params.created ? "created" : params.deleted ? "deleted" : undefined;
+  const flashParam = params.created
+    ? "created"
+    : params.deleted
+      ? "deleted"
+      : params.updated
+        ? "updated"
+        : params.edited
+          ? "edited"
+          : undefined;
 
   const [viewings, agents] = await Promise.all([
     getViewings({ agentId, status, outcome, dateFrom, dateTo, needsFollowUp }),

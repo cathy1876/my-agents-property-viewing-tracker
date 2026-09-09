@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 const MESSAGES: Record<string, string> = {
   created: "Viewing created successfully.",
   updated: "Viewing updated successfully.",
+  edited: "Viewing edited successfully.",
   deleted: "Viewing deleted successfully.",
 };
 

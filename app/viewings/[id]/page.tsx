@@ -5,27 +5,21 @@ import { StatusBadge, OutcomeBadge } from "@/components/badges";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { deleteViewingAction } from "@/lib/actions/viewings";
 import { FormattedDateTime } from "@/components/formatted-date-time";
-import { FlashBanner } from "@/components/flash-banner";
 import { UpdateForm } from "./update-form";
 
 export const dynamic = "force-dynamic";
 
 export default async function ViewingDetailPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ updated?: string }>;
 }) {
   const { id } = await params;
-  const { updated } = await searchParams;
   const viewing = await getViewing(id);
   if (!viewing) notFound();
 
   return (
     <div className="mx-auto max-w-2xl">
-      <FlashBanner param={updated ? "updated" : undefined} pathname={`/viewings/${id}`} />
-
       <div className="mb-6 flex items-center justify-between">
         <div>
           <Link href="/viewings" className="text-sm text-neutral-500 hover:underline">
