@@ -8,11 +8,16 @@ const nextConfig: NextConfig = {
   eslint: { ignoreDuringBuilds: true },
   // The floating dev-mode route indicator overlaps mobile card/table content.
   devIndicators: false,
-  // Without this, the client-side Router Cache can serve a stale RSC
-  // payload for a route on first paint after a mutation (e.g. Edit's
-  // redirect back to a detail page visited earlier in the session),
-  // briefly showing pre-update data before a second render corrects it.
-  // force-dynamic alone doesn't fix this - it's a separate client cache.
+  // Without this, Link prefetching populates the client-side Router Cache
+  // with a snapshot of a route (e.g. /viewings, prefetched from the detail
+  // page's "Back to viewings" link) *before* a later mutation (e.g.
+  // updating a viewing's outcome in place). Next's default 30s staleTime
+  // means that prefetched snapshot is treated as fresh and reused as-is on
+  // the next visit, even though revalidatePath() has already invalidated
+  // the server-side data - showing genuinely stale (pre-mutation) content
+  // that doesn't self-correct until the 30s window lapses. This forces
+  // every navigation to a dynamic route to refetch instead of reusing a
+  // stale prefetch.
   experimental: {
     staleTimes: {
       dynamic: 0,
