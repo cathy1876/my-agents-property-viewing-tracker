@@ -69,6 +69,7 @@ export interface ViewingWithRelations extends Viewing {
 
 export interface ViewingFilters {
   agentId?: string;
+  clientId?: string;
   status?: ViewingStatus;
   outcome?: ViewingOutcome;
   dateFrom?: string;

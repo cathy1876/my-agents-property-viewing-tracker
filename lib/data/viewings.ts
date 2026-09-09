@@ -44,6 +44,9 @@ export async function getViewings(
   if (filters.agentId) {
     query = query.eq("agent_id", filters.agentId);
   }
+  if (filters.clientId) {
+    query = query.eq("client_id", filters.clientId);
+  }
   if (filters.outcome) {
     query = query.eq("outcome", filters.outcome);
   }

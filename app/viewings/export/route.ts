@@ -33,6 +33,7 @@ export async function GET(request: NextRequest) {
 
   const viewings = await getViewings({
     agentId: params.get("agent") || undefined,
+    clientId: params.get("client") || undefined,
     status: (params.get("status") as ViewingStatus) || undefined,
     outcome: (params.get("outcome") as ViewingOutcome) || undefined,
     dateFrom: params.get("dateFrom") || undefined,

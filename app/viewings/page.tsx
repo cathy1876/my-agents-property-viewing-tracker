@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getViewings, getDisplayStatus } from "@/lib/data/viewings";
 import { getAgents } from "@/lib/data/agents";
+import { getClients } from "@/lib/data/clients";
 import { StatusBadge, OutcomeBadge, STATUS_BOX_STYLES } from "@/components/badges";
 import { FormattedDateTime } from "@/components/formatted-date-time";
 import { ExportCsvLink } from "@/components/export-csv-link";
@@ -30,6 +31,7 @@ export default async function ViewingsPage({
 }) {
   const params = await searchParams;
   const agentId = params.agent || undefined;
+  const clientId = params.client || undefined;
   const status = (params.status as ViewingStatus) || undefined;
   const outcome = (params.outcome as ViewingOutcome) || undefined;
   const dateFrom = params.dateFrom || undefined;
@@ -45,15 +47,18 @@ export default async function ViewingsPage({
           ? "edited"
           : undefined;
 
-  const [viewings, agents] = await Promise.all([
-    getViewings({ agentId, status, outcome, dateFrom, dateTo, needsFollowUp }),
+  const [viewings, agents, clients] = await Promise.all([
+    getViewings({ agentId, clientId, status, outcome, dateFrom, dateTo, needsFollowUp }),
     getAgents(),
+    getClients(),
   ]);
 
-  const hasFilters = agentId || status || outcome || dateFrom || dateTo || needsFollowUp;
+  const hasFilters =
+    agentId || clientId || status || outcome || dateFrom || dateTo || needsFollowUp;
 
   const exportQuery = new URLSearchParams();
   if (agentId) exportQuery.set("agent", agentId);
+  if (clientId) exportQuery.set("client", clientId);
   if (status) exportQuery.set("status", status);
   if (outcome) exportQuery.set("outcome", outcome);
   if (dateFrom) exportQuery.set("dateFrom", dateFrom);
@@ -89,6 +94,21 @@ export default async function ViewingsPage({
             {agents.map((a) => (
               <option key={a.id} value={a.id}>
                 {a.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-neutral-500">Client</label>
+          <select
+            name="client"
+            defaultValue={clientId || ""}
+            className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+          >
+            <option value="">All clients</option>
+            {clients.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
               </option>
             ))}
           </select>
