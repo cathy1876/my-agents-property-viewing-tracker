@@ -222,6 +222,7 @@ export function NewViewingForm({
                 <option key={a.id} value={a.id}>
                   {a.name}
                   {a.agent_code ? ` (${a.agent_code})` : ""}
+                  {!a.is_active ? " — Deactivated" : ""}
                 </option>
               ))}
             </select>

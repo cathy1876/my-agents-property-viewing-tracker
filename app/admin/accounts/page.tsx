@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { getProfilesWithAgents } from "@/lib/data/accounts";
 import { LinkAccountForm } from "./link-account-form";
+import { AgentStatusBadge } from "@/components/badges";
 
 export const dynamic = "force-dynamic";
 
@@ -53,9 +54,15 @@ export default async function AdminAccountsPage() {
                     {a.role}
                   </td>
                   <td className="px-4 py-3 text-neutral-700">
-                    {a.agent
-                      ? `${a.agent.name}${a.agent.agent_code ? ` (${a.agent.agent_code})` : ""}`
-                      : "—"}
+                    {a.agent ? (
+                      <div className="flex items-center gap-2">
+                        {a.agent.name}
+                        {a.agent.agent_code ? ` (${a.agent.agent_code})` : ""}
+                        <AgentStatusBadge isActive={a.agent.is_active} />
+                      </div>
+                    ) : (
+                      "—"
+                    )}
                   </td>
                 </tr>
               ))}

@@ -51,3 +51,14 @@ export function OutcomeBadge({ outcome }: { outcome: ViewingOutcome | null }) {
 }
 
 export const OUTCOME_LABEL_MAP = OUTCOME_LABELS;
+
+// Only renders for a deactivated agent - an active agent (the common
+// case) shows no badge at all, keeping lists uncluttered.
+export function AgentStatusBadge({ isActive }: { isActive: boolean }) {
+  if (isActive) return null;
+  return (
+    <span className="inline-flex items-center rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-medium text-neutral-600 ring-1 ring-inset ring-neutral-500/20">
+      Deactivated
+    </span>
+  );
+}

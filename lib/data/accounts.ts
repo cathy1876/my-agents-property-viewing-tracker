@@ -2,7 +2,12 @@ import { createClient } from "@/lib/supabase/server";
 import type { Profile } from "@/lib/types";
 
 export interface ProfileWithAgent extends Profile {
-  agent: { id: string; name: string; agent_code: string | null } | null;
+  agent: {
+    id: string;
+    name: string;
+    agent_code: string | null;
+    is_active: boolean;
+  } | null;
 }
 
 // The app has no service-role key, so it can't read auth.users (email,
@@ -18,7 +23,7 @@ export async function getProfilesWithAgents(): Promise<ProfileWithAgent[]> {
 
   const { data: agents, error: agentsError } = await supabase
     .from("agents")
-    .select("id, name, agent_code, user_id")
+    .select("id, name, agent_code, user_id, is_active")
     .not("user_id", "is", null);
   if (agentsError) throw new Error(agentsError.message);
 
@@ -33,6 +38,7 @@ export async function getProfilesWithAgents(): Promise<ProfileWithAgent[]> {
           id: agentByUserId.get(p.id)!.id,
           name: agentByUserId.get(p.id)!.name,
           agent_code: agentByUserId.get(p.id)!.agent_code,
+          is_active: agentByUserId.get(p.id)!.is_active,
         }
       : null,
   }));

@@ -8,7 +8,7 @@ import type {
 } from "@/lib/types";
 
 const VIEWING_SELECT =
-  "*, client:clients(id, name, phone), property:properties(id, address), agent:agents(id, name, agent_code, agent_email)";
+  "*, client:clients(id, name, phone), property:properties(id, address), agent:agents(id, name, agent_code, agent_email, is_active)";
 
 export interface ViewingInput {
   client_id: string;

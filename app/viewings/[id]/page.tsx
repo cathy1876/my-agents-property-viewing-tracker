@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDisplayStatus, getViewing } from "@/lib/data/viewings";
-import { StatusBadge, OutcomeBadge } from "@/components/badges";
+import { StatusBadge, OutcomeBadge, AgentStatusBadge } from "@/components/badges";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { deleteViewingAction } from "@/lib/actions/viewings";
 import { FormattedDateTime } from "@/components/formatted-date-time";
@@ -87,18 +87,21 @@ export default async function ViewingDetailPage({
         <div>
           <div className="text-xs font-medium text-neutral-500">Agent</div>
           {viewing.agent ? (
-            isAdmin ? (
-              <Link
-                href={`/agents/${viewing.agent.id}`}
-                className="font-medium text-neutral-900 hover:underline"
-              >
-                {viewing.agent.name}
-              </Link>
-            ) : (
-              <span className="font-medium text-neutral-900">
-                {viewing.agent.name}
-              </span>
-            )
+            <div className="flex items-center gap-2">
+              {isAdmin ? (
+                <Link
+                  href={`/agents/${viewing.agent.id}`}
+                  className="font-medium text-neutral-900 hover:underline"
+                >
+                  {viewing.agent.name}
+                </Link>
+              ) : (
+                <span className="font-medium text-neutral-900">
+                  {viewing.agent.name}
+                </span>
+              )}
+              <AgentStatusBadge isActive={viewing.agent.is_active} />
+            </div>
           ) : (
             <span className="text-neutral-400">—</span>
           )}

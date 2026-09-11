@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
   createAgentRecord,
-  deleteAgentRecord,
   setAgentActive,
   updateAgentRecord,
 } from "@/lib/data/agents";
@@ -54,12 +53,6 @@ export async function updateAgentAction(
   revalidatePath("/agents");
   revalidatePath(`/agents/${id}`);
   redirect(`/agents/${id}`);
-}
-
-export async function deleteAgentAction(id: string): Promise<void> {
-  await deleteAgentRecord(id);
-  revalidatePath("/agents");
-  redirect("/agents");
 }
 
 export async function toggleAgentActiveAction(

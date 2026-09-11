@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAgent } from "@/lib/data/agents";
-import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { AgentActiveToggle } from "@/components/agent-active-toggle";
-import { deleteAgentAction, toggleAgentActiveAction } from "@/lib/actions/agents";
+import { toggleAgentActiveAction } from "@/lib/actions/agents";
 import { requireAdmin } from "@/lib/auth/require-admin";
+import { AgentStatusBadge } from "@/components/badges";
 
 export default async function AgentDetailPage({
   params,
@@ -23,8 +23,9 @@ export default async function AgentDetailPage({
           <Link href="/agents" className="text-sm text-neutral-500 hover:underline">
             ← Back to agents
           </Link>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">
+          <h1 className="mt-1 flex items-center gap-2 text-2xl font-semibold tracking-tight">
             {agent.name}
+            <AgentStatusBadge isActive={agent.is_active} />
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -37,10 +38,6 @@ export default async function AgentDetailPage({
           <AgentActiveToggle
             isActive={agent.is_active}
             action={toggleAgentActiveAction.bind(null, id, !agent.is_active)}
-          />
-          <ConfirmDeleteButton
-            action={deleteAgentAction.bind(null, id)}
-            confirmMessage="Delete this agent? This cannot be undone."
           />
         </div>
       </div>

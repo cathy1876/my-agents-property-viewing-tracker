@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getAgents } from "@/lib/data/agents";
 import { requireAdmin } from "@/lib/auth/require-admin";
+import { AgentStatusBadge } from "@/components/badges";
 
 export const dynamic = "force-dynamic";
 
@@ -50,12 +51,15 @@ export default async function AgentsPage() {
               {agents.map((a) => (
                 <tr key={a.id} className="hover:bg-neutral-50">
                   <td className="px-4 py-3">
-                    <Link
-                      href={`/agents/${a.id}`}
-                      className="font-medium text-neutral-900 hover:underline"
-                    >
-                      {a.name}
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/agents/${a.id}`}
+                        className="font-medium text-neutral-900 hover:underline"
+                      >
+                        {a.name}
+                      </Link>
+                      <AgentStatusBadge isActive={a.is_active} />
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-neutral-700">
                     {a.agent_code || "—"}

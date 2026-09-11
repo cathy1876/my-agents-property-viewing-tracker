@@ -73,7 +73,7 @@ export interface Viewing {
 export interface ViewingWithRelations extends Viewing {
   client: Pick<Client, "id" | "name" | "phone"> | null;
   property: Pick<Property, "id" | "address"> | null;
-  agent: Pick<Agent, "id" | "name" | "agent_code" | "agent_email"> | null;
+  agent: Pick<Agent, "id" | "name" | "agent_code" | "agent_email" | "is_active"> | null;
 }
 
 export interface ViewingFilters {

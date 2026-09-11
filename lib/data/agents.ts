@@ -67,12 +67,6 @@ export async function updateAgentRecord(
   return data;
 }
 
-export async function deleteAgentRecord(id: string): Promise<void> {
-  const supabase = await createClient();
-  const { error } = await supabase.from("agents").delete().eq("id", id);
-  if (error) throw new Error(error.message);
-}
-
 // Deactivating blocks that agent's login (RLS's current_agent_id() only
 // returns active agents, and the login/middleware guards sign an
 // inactive agent's session back out) without touching any of their

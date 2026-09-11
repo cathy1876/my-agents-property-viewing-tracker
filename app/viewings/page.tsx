@@ -2,7 +2,12 @@ import Link from "next/link";
 import { getViewings, getDisplayStatus } from "@/lib/data/viewings";
 import { getAgents } from "@/lib/data/agents";
 import { getClients } from "@/lib/data/clients";
-import { StatusBadge, OutcomeBadge, STATUS_BOX_STYLES } from "@/components/badges";
+import {
+  StatusBadge,
+  OutcomeBadge,
+  AgentStatusBadge,
+  STATUS_BOX_STYLES,
+} from "@/components/badges";
 import { FormattedDateTime } from "@/components/formatted-date-time";
 import { ExportCsvLink } from "@/components/export-csv-link";
 import { FlashBanner } from "@/components/flash-banner";
@@ -100,6 +105,7 @@ export default async function ViewingsPage({
               {agents.map((a) => (
                 <option key={a.id} value={a.id}>
                   {a.name}
+                  {!a.is_active ? " (Deactivated)" : ""}
                 </option>
               ))}
             </select>
@@ -238,7 +244,10 @@ export default async function ViewingsPage({
                       {v.property?.address ?? "—"}
                     </dd>
                     <dt className="text-neutral-500">Agent</dt>
-                    <dd className="text-neutral-700">{v.agent?.name ?? "—"}</dd>
+                    <dd className="flex items-center gap-2 text-neutral-700">
+                      {v.agent?.name ?? "—"}
+                      {v.agent && <AgentStatusBadge isActive={v.agent.is_active} />}
+                    </dd>
                     <dt className="text-neutral-500">Agent Code</dt>
                     <dd className="text-neutral-700">
                       {v.agent?.agent_code ?? "—"}
@@ -325,7 +334,10 @@ export default async function ViewingsPage({
                       {v.property?.address ?? "—"}
                     </td>
                     <td className="px-4 py-3 text-neutral-700">
-                      {v.agent?.name ?? "—"}
+                      <div className="flex items-center gap-2">
+                        {v.agent?.name ?? "—"}
+                        {v.agent && <AgentStatusBadge isActive={v.agent.is_active} />}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-neutral-700">
                       {v.agent?.agent_code ?? "—"}

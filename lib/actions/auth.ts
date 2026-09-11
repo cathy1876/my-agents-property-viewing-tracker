@@ -15,7 +15,7 @@ export interface LoginResult {
 // which emails are registered). The app can't tell these apart either,
 // so every failure shows this one fixed message rather than guessing.
 const LOGIN_ERROR =
-  "Incorrect email or password. For password reset or account help, contact Support at [Tel. No. XXXXXXXX].";
+  "Incorrect email or password. For password reset or account help, contact Support at 8363 1122.";
 
 export async function loginAction(
   _prev: LoginResult,
@@ -52,7 +52,7 @@ export async function loginAction(
     return {
       success: false,
       error:
-        "This login hasn't been linked to an account yet. Contact Support at [Tel. No. XXXXXXXX].",
+        "This login hasn't been linked to an account yet. Contact Support at 8363 1122.",
     };
   }
 
@@ -67,7 +67,7 @@ export async function loginAction(
       return {
         success: false,
         error:
-          "This account has been deactivated. Contact Support at [Tel. No. XXXXXXXX].",
+          "This account has been deactivated. Contact Support at 8363 1122.",
       };
     }
   }
