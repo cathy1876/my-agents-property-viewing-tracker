@@ -1,21 +1,28 @@
 import Link from "next/link";
 import { getProperties } from "@/lib/data/properties";
+import { getSessionProfile } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function PropertiesPage() {
-  const properties = await getProperties();
+  const [properties, profile] = await Promise.all([
+    getProperties(),
+    getSessionProfile(),
+  ]);
+  const isAdmin = profile?.role === "admin";
 
   return (
     <div className="mx-auto max-w-4xl">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Properties</h1>
-        <Link
-          href="/properties/new"
-          className="inline-flex items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-        >
-          New Property
-        </Link>
+        {isAdmin && (
+          <Link
+            href="/properties/new"
+            className="inline-flex items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          >
+            New Property
+          </Link>
+        )}
       </div>
 
       {properties.length === 0 ? (
@@ -23,12 +30,14 @@ export default async function PropertiesPage() {
           <p className="text-neutral-500">
             No properties yet. Add your first property.
           </p>
-          <Link
-            href="/properties/new"
-            className="inline-flex items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-          >
-            New Property
-          </Link>
+          {isAdmin && (
+            <Link
+              href="/properties/new"
+              className="inline-flex items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            >
+              New Property
+            </Link>
+          )}
         </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-neutral-200">

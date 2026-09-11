@@ -3,19 +3,34 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { logoutAction } from "@/lib/actions/auth";
+import type { SessionProfile } from "@/lib/auth/session";
 
-const LINKS = [
+const BASE_LINKS = [
   { href: "/viewings", label: "Viewings" },
   { href: "/clients", label: "Clients" },
   { href: "/properties", label: "Properties" },
   { href: "/agents", label: "Agents" },
 ];
+const ADMIN_ONLY_LINKS = [{ href: "/admin/accounts", label: "Manage Accounts" }];
 
-function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
+function NavLinks({
+  profile,
+  onNavigate,
+}: {
+  profile: SessionProfile;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
+  // Agents get no view of the Agents section at all - not even their own
+  // record via a list - since a list of "just me" implies others exist.
+  const links = [
+    ...BASE_LINKS.filter((l) => !(l.href === "/agents" && profile.role === "agent")),
+    ...(profile.role === "admin" ? ADMIN_ONLY_LINKS : []),
+  ];
   return (
     <nav className="flex flex-col gap-1">
-      {LINKS.map((link) => {
+      {links.map((link) => {
         const active = pathname?.startsWith(link.href);
         return (
           <Link
@@ -36,8 +51,30 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-export function Sidebar() {
+function AccountFooter({ profile }: { profile: SessionProfile }) {
+  return (
+    <div className="mt-auto flex flex-col gap-2 border-t border-neutral-200 pt-4 text-sm">
+      <div className="truncate text-neutral-500">
+        {profile.email}
+        <span className="ml-1 capitalize">({profile.role})</span>
+      </div>
+      <form action={logoutAction}>
+        <button
+          type="submit"
+          className="font-medium text-neutral-700 hover:text-neutral-900"
+        >
+          Sign out
+        </button>
+      </form>
+    </div>
+  );
+}
+
+export function Sidebar({ profile }: { profile: SessionProfile | null }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  if (pathname === "/login" || !profile) return null;
 
   return (
     <>
@@ -60,13 +97,15 @@ export function Sidebar() {
         </button>
       </header>
       {open && (
-        <div className="border-b border-neutral-200 px-4 py-3 md:hidden">
-          <NavLinks onNavigate={() => setOpen(false)} />
+        <div className="flex flex-col border-b border-neutral-200 px-4 py-3 md:hidden">
+          <NavLinks profile={profile} onNavigate={() => setOpen(false)} />
+          <AccountFooter profile={profile} />
         </div>
       )}
       <aside className="hidden md:flex md:w-56 md:flex-col md:border-r md:border-neutral-200 md:px-4 md:py-6">
         <span className="mb-6 px-3 text-lg font-semibold">Viewing Tracker</span>
-        <NavLinks />
+        <NavLinks profile={profile} />
+        <AccountFooter profile={profile} />
       </aside>
     </>
   );

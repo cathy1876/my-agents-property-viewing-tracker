@@ -42,17 +42,23 @@ export function AgentForm({
           className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
         />
       </div>
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-neutral-500">
-          Agent Email
-        </label>
-        <input
-          name="agent_email"
-          type="email"
-          defaultValue={agent?.agent_email ?? ""}
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
-        />
-      </div>
+      {agent && (
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-neutral-500">
+            Agent Email
+          </label>
+          {agent.agent_email ? (
+            <p className="rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700">
+              {agent.agent_email}
+            </p>
+          ) : (
+            <p className="text-sm text-neutral-500">
+              Not linked to a login yet - the email will appear
+              automatically once this agent is linked via Manage Accounts.
+            </p>
+          )}
+        </div>
+      )}
       <SubmitButton>{agent ? "Save Changes" : "Add Agent"}</SubmitButton>
     </form>
   );

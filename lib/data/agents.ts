@@ -1,10 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Agent } from "@/lib/types";
 
+// agent_email is deliberately absent here - it's only ever set once, at
+// link time, from the agent's real Supabase Auth email (see
+// createAndLinkAgent in lib/data/accounts.ts), and this ordinary
+// create/update path must never overwrite it.
 export interface AgentInput {
   name: string;
   agent_code?: string | null;
-  agent_email?: string | null;
 }
 
 export async function getAgents(): Promise<Agent[]> {
@@ -37,7 +40,6 @@ export async function createAgentRecord(input: AgentInput): Promise<Agent> {
     .insert({
       name: input.name,
       agent_code: input.agent_code || null,
-      agent_email: input.agent_email || null,
     })
     .select("*")
     .single();
@@ -56,7 +58,6 @@ export async function updateAgentRecord(
     .update({
       name: input.name,
       agent_code: input.agent_code || null,
-      agent_email: input.agent_email || null,
     })
     .eq("id", id)
     .select("*")
@@ -70,4 +71,25 @@ export async function deleteAgentRecord(id: string): Promise<void> {
   const supabase = await createClient();
   const { error } = await supabase.from("agents").delete().eq("id", id);
   if (error) throw new Error(error.message);
+}
+
+// Deactivating blocks that agent's login (RLS's current_agent_id() only
+// returns active agents, and the login/middleware guards sign an
+// inactive agent's session back out) without touching any of their
+// historical Viewings/Clients/Properties, and without deleting the
+// agents row itself - reactivating restores access exactly as before.
+export async function setAgentActive(
+  id: string,
+  isActive: boolean,
+): Promise<Agent> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("agents")
+    .update({ is_active: isActive })
+    .eq("id", id)
+    .select("*")
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
 }

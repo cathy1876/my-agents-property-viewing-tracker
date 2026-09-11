@@ -2,13 +2,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAgent } from "@/lib/data/agents";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
-import { deleteAgentAction } from "@/lib/actions/agents";
+import { AgentActiveToggle } from "@/components/agent-active-toggle";
+import { deleteAgentAction, toggleAgentActiveAction } from "@/lib/actions/agents";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export default async function AgentDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireAdmin();
   const { id } = await params;
   const agent = await getAgent(id);
   if (!agent) notFound();
@@ -31,6 +34,10 @@ export default async function AgentDetailPage({
           >
             Edit
           </Link>
+          <AgentActiveToggle
+            isActive={agent.is_active}
+            action={toggleAgentActiveAction.bind(null, id, !agent.is_active)}
+          />
           <ConfirmDeleteButton
             action={deleteAgentAction.bind(null, id)}
             confirmMessage="Delete this agent? This cannot be undone."
@@ -49,6 +56,20 @@ export default async function AgentDetailPage({
           <div className="text-xs font-medium text-neutral-500">Agent Email</div>
           <div className="font-medium text-neutral-900">
             {agent.agent_email || "—"}
+          </div>
+        </div>
+        <div>
+          <div className="text-xs font-medium text-neutral-500">Login Access</div>
+          <div className="mt-1">
+            <span
+              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${
+                agent.is_active
+                  ? "bg-green-50 text-green-700 ring-green-600/20"
+                  : "bg-neutral-100 text-neutral-600 ring-neutral-500/20"
+              }`}
+            >
+              {agent.is_active ? "Active" : "Deactivated"}
+            </span>
           </div>
         </div>
       </div>

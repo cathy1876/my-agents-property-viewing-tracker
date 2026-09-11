@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { getAgents } from "@/lib/data/agents";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export const dynamic = "force-dynamic";
 
 export default async function AgentsPage() {
+  await requireAdmin();
   const agents = await getAgents();
 
   return (

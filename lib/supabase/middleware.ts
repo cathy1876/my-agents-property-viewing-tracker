@@ -35,7 +35,49 @@ export async function updateSession(request: NextRequest) {
     });
 
     // Refresh session so it doesn't expire while user is active
-    await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const { pathname } = request.nextUrl;
+    const isLoginRoute = pathname === "/login";
+
+    if (!user) {
+      if (isLoginRoute) return response;
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    // A valid Supabase Auth session isn't enough on its own - it also
+    // needs a profiles row (linked by an admin) and, for an agent, an
+    // active agents row. This re-checks on every request (not just at
+    // login) so an account deactivated mid-session loses access on its
+    // very next request, not just its next login attempt.
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    let blocked = !profile;
+    if (profile?.role === "agent") {
+      const { data: agent } = await supabase
+        .from("agents")
+        .select("is_active")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      blocked = !agent || !agent.is_active;
+    }
+
+    if (blocked) {
+      await supabase.auth.signOut();
+      return NextResponse.redirect(
+        new URL("/login?blocked=1", request.url),
+      );
+    }
+
+    if (isLoginRoute) {
+      return NextResponse.redirect(new URL("/viewings", request.url));
+    }
     return response;
   } catch {
     // Never let an auth hiccup crash the entire edge middleware

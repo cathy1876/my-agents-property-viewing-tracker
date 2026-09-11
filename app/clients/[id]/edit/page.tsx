@@ -2,12 +2,14 @@ import { notFound } from "next/navigation";
 import { getClient } from "@/lib/data/clients";
 import { updateClientAction } from "@/lib/actions/clients";
 import { ClientForm } from "@/components/client-form";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export default async function EditClientPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireAdmin();
   const { id } = await params;
   const client = await getClient(id);
   if (!client) notFound();

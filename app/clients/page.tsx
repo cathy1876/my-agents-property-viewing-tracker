@@ -1,32 +1,38 @@
 import Link from "next/link";
 import { getClients } from "@/lib/data/clients";
+import { getSessionProfile } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function ClientsPage() {
-  const clients = await getClients();
+  const [clients, profile] = await Promise.all([getClients(), getSessionProfile()]);
+  const isAdmin = profile?.role === "admin";
 
   return (
     <div className="mx-auto max-w-4xl">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Clients</h1>
-        <Link
-          href="/clients/new"
-          className="inline-flex items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-        >
-          New Client
-        </Link>
-      </div>
-
-      {clients.length === 0 ? (
-        <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed border-neutral-300 py-16 text-center">
-          <p className="text-neutral-500">No clients yet. Add your first client.</p>
+        {isAdmin && (
           <Link
             href="/clients/new"
             className="inline-flex items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:opacity-90"
           >
             New Client
           </Link>
+        )}
+      </div>
+
+      {clients.length === 0 ? (
+        <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed border-neutral-300 py-16 text-center">
+          <p className="text-neutral-500">No clients yet. Add your first client.</p>
+          {isAdmin && (
+            <Link
+              href="/clients/new"
+              className="inline-flex items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            >
+              New Client
+            </Link>
+          )}
         </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-neutral-200">

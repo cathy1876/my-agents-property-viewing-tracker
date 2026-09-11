@@ -6,6 +6,7 @@ import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { deleteViewingAction } from "@/lib/actions/viewings";
 import { FormattedDateTime } from "@/components/formatted-date-time";
 import { UpdateForm } from "./update-form";
+import { getSessionProfile } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
@@ -15,8 +16,9 @@ export default async function ViewingDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const viewing = await getViewing(id);
+  const [viewing, profile] = await Promise.all([getViewing(id), getSessionProfile()]);
   if (!viewing) notFound();
+  const isAdmin = profile?.role === "admin";
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -36,18 +38,20 @@ export default async function ViewingDetailPage({
             />
           </h1>
         </div>
-        <div className="flex items-center gap-3">
-          <Link
-            href={`/viewings/${id}/edit`}
-            className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
-          >
-            Edit
-          </Link>
-          <ConfirmDeleteButton
-            action={deleteViewingAction.bind(null, id)}
-            confirmMessage="Delete this viewing? This cannot be undone."
-          />
-        </div>
+        {isAdmin && (
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/viewings/${id}/edit`}
+              className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
+            >
+              Edit
+            </Link>
+            <ConfirmDeleteButton
+              action={deleteViewingAction.bind(null, id)}
+              confirmMessage="Delete this viewing? This cannot be undone."
+            />
+          </div>
+        )}
       </div>
 
       <div className="mb-6 grid gap-4 rounded-lg border border-neutral-200 p-5 sm:grid-cols-2">
@@ -83,12 +87,18 @@ export default async function ViewingDetailPage({
         <div>
           <div className="text-xs font-medium text-neutral-500">Agent</div>
           {viewing.agent ? (
-            <Link
-              href={`/agents/${viewing.agent.id}`}
-              className="font-medium text-neutral-900 hover:underline"
-            >
-              {viewing.agent.name}
-            </Link>
+            isAdmin ? (
+              <Link
+                href={`/agents/${viewing.agent.id}`}
+                className="font-medium text-neutral-900 hover:underline"
+              >
+                {viewing.agent.name}
+              </Link>
+            ) : (
+              <span className="font-medium text-neutral-900">
+                {viewing.agent.name}
+              </span>
+            )
           ) : (
             <span className="text-neutral-400">—</span>
           )}

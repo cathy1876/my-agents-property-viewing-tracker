@@ -2,12 +2,14 @@ import { notFound } from "next/navigation";
 import { getProperty } from "@/lib/data/properties";
 import { updatePropertyAction } from "@/lib/actions/properties";
 import { PropertyForm } from "@/components/property-form";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export default async function EditPropertyPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireAdmin();
   const { id } = await params;
   const property = await getProperty(id);
   if (!property) notFound();

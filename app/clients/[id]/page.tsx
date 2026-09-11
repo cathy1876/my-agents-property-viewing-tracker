@@ -5,6 +5,7 @@ import { getViewingsForClient } from "@/lib/data/viewings";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { ViewingMiniList } from "@/components/viewing-mini-list";
 import { deleteClientAction } from "@/lib/actions/clients";
+import { getSessionProfile } from "@/lib/auth/session";
 
 export default async function ClientDetailPage({
   params,
@@ -12,9 +13,10 @@ export default async function ClientDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const client = await getClient(id);
+  const [client, profile] = await Promise.all([getClient(id), getSessionProfile()]);
   if (!client) notFound();
   const viewings = await getViewingsForClient(id);
+  const isAdmin = profile?.role === "admin";
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -27,18 +29,20 @@ export default async function ClientDetailPage({
             {client.name}
           </h1>
         </div>
-        <div className="flex items-center gap-3">
-          <Link
-            href={`/clients/${id}/edit`}
-            className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
-          >
-            Edit
-          </Link>
-          <ConfirmDeleteButton
-            action={deleteClientAction.bind(null, id)}
-            confirmMessage="Delete this client? Their viewings will also be deleted. This cannot be undone."
-          />
-        </div>
+        {isAdmin && (
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/clients/${id}/edit`}
+              className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
+            >
+              Edit
+            </Link>
+            <ConfirmDeleteButton
+              action={deleteClientAction.bind(null, id)}
+              confirmMessage="Delete this client? Their viewings will also be deleted. This cannot be undone."
+            />
+          </div>
+        )}
       </div>
 
       <div className="mb-6 grid gap-4 rounded-lg border border-neutral-200 p-5 sm:grid-cols-2">

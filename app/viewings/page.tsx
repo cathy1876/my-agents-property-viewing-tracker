@@ -6,6 +6,7 @@ import { StatusBadge, OutcomeBadge, STATUS_BOX_STYLES } from "@/components/badge
 import { FormattedDateTime } from "@/components/formatted-date-time";
 import { ExportCsvLink } from "@/components/export-csv-link";
 import { FlashBanner } from "@/components/flash-banner";
+import { getSessionProfile } from "@/lib/auth/session";
 import {
   VIEWING_OUTCOMES,
   VIEWING_STATUSES,
@@ -47,11 +48,13 @@ export default async function ViewingsPage({
           ? "edited"
           : undefined;
 
-  const [viewings, agents, clients] = await Promise.all([
+  const [viewings, agents, clients, profile] = await Promise.all([
     getViewings({ agentId, clientId, status, outcome, dateFrom, dateTo, needsFollowUp }),
     getAgents(),
     getClients(),
+    getSessionProfile(),
   ]);
+  const isAdmin = profile?.role === "admin";
 
   const hasFilters =
     agentId || clientId || status || outcome || dateFrom || dateTo || needsFollowUp;
@@ -73,31 +76,35 @@ export default async function ViewingsPage({
         <h1 className="text-2xl font-semibold tracking-tight">Viewings</h1>
         <div className="flex gap-2">
           <ExportCsvLink baseHref={`/viewings/export?${exportQuery.toString()}`} />
-          <Link
-            href="/viewings/new"
-            className="inline-flex items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-          >
-            New Viewing
-          </Link>
+          {isAdmin && (
+            <Link
+              href="/viewings/new"
+              className="inline-flex items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            >
+              New Viewing
+            </Link>
+          )}
         </div>
       </div>
 
       <form className="mb-6 flex flex-wrap items-end gap-3 rounded-lg border border-neutral-300 bg-neutral-100 p-4">
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-neutral-500">Agent</label>
-          <select
-            name="agent"
-            defaultValue={agentId || ""}
-            className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
-          >
-            <option value="">All agents</option>
-            {agents.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        {isAdmin && (
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-neutral-500">Agent</label>
+            <select
+              name="agent"
+              defaultValue={agentId || ""}
+              className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+            >
+              <option value="">All agents</option>
+              {agents.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-neutral-500">Client</label>
           <select
@@ -194,7 +201,7 @@ export default async function ViewingsPage({
               ? "No viewings match these filters."
               : "No viewings yet. Create your first viewing."}
           </p>
-          {!hasFilters && (
+          {!hasFilters && isAdmin && (
             <Link
               href="/viewings/new"
               className="inline-flex items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:opacity-90"

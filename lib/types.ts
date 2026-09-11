@@ -15,6 +15,14 @@ export const VIEWING_OUTCOMES: ViewingOutcome[] = [
   "dropped_not_interested",
 ];
 
+export type UserRole = "admin" | "agent";
+
+export interface Profile {
+  id: string;
+  role: UserRole;
+  created_at: string;
+}
+
 export interface Client {
   id: string;
   user_id: string | null;
@@ -31,6 +39,7 @@ export interface Agent {
   name: string;
   agent_code: string | null;
   agent_email: string | null;
+  is_active: boolean;
   created_at: string;
 }
 

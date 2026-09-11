@@ -2,12 +2,14 @@ import { notFound } from "next/navigation";
 import { getAgent } from "@/lib/data/agents";
 import { updateAgentAction } from "@/lib/actions/agents";
 import { AgentForm } from "@/components/agent-form";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export default async function EditAgentPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireAdmin();
   const { id } = await params;
   const agent = await getAgent(id);
   if (!agent) notFound();

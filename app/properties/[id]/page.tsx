@@ -5,6 +5,7 @@ import { getViewingsForProperty } from "@/lib/data/viewings";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { ViewingMiniList } from "@/components/viewing-mini-list";
 import { deletePropertyAction } from "@/lib/actions/properties";
+import { getSessionProfile } from "@/lib/auth/session";
 
 export default async function PropertyDetailPage({
   params,
@@ -12,9 +13,13 @@ export default async function PropertyDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const property = await getProperty(id);
+  const [property, profile] = await Promise.all([
+    getProperty(id),
+    getSessionProfile(),
+  ]);
   if (!property) notFound();
   const viewings = await getViewingsForProperty(id);
+  const isAdmin = profile?.role === "admin";
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -27,18 +32,20 @@ export default async function PropertyDetailPage({
             {property.address}
           </h1>
         </div>
-        <div className="flex items-center gap-3">
-          <Link
-            href={`/properties/${id}/edit`}
-            className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
-          >
-            Edit
-          </Link>
-          <ConfirmDeleteButton
-            action={deletePropertyAction.bind(null, id)}
-            confirmMessage="Delete this property? Its viewings will also be deleted. This cannot be undone."
-          />
-        </div>
+        {isAdmin && (
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/properties/${id}/edit`}
+              className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
+            >
+              Edit
+            </Link>
+            <ConfirmDeleteButton
+              action={deletePropertyAction.bind(null, id)}
+              confirmMessage="Delete this property? Its viewings will also be deleted. This cannot be undone."
+            />
+          </div>
+        )}
       </div>
 
       <div className="mb-6 grid gap-4 rounded-lg border border-neutral-200 p-5 sm:grid-cols-2">

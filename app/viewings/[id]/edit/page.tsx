@@ -4,6 +4,7 @@ import { getClients } from "@/lib/data/clients";
 import { getProperties } from "@/lib/data/properties";
 import { getAgents } from "@/lib/data/agents";
 import { EditViewingForm } from "./edit-viewing-form";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,7 @@ export default async function EditViewingPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireAdmin();
   const { id } = await params;
   const [viewing, clients, properties, agents] = await Promise.all([
     getViewing(id),

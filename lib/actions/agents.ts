@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import {
   createAgentRecord,
   deleteAgentRecord,
+  setAgentActive,
   updateAgentRecord,
 } from "@/lib/data/agents";
 import type { ActionResult } from "@/lib/actions/clients";
@@ -23,7 +24,6 @@ export async function createAgentAction(
     const agent = await createAgentRecord({
       name,
       agent_code: String(formData.get("agent_code") || "").trim() || null,
-      agent_email: String(formData.get("agent_email") || "").trim() || null,
     });
     agentId = agent.id;
   } catch (err) {
@@ -47,7 +47,6 @@ export async function updateAgentAction(
     await updateAgentRecord(id, {
       name,
       agent_code: String(formData.get("agent_code") || "").trim() || null,
-      agent_email: String(formData.get("agent_email") || "").trim() || null,
     });
   } catch (err) {
     return { success: false, error: (err as Error).message };
@@ -61,4 +60,13 @@ export async function deleteAgentAction(id: string): Promise<void> {
   await deleteAgentRecord(id);
   revalidatePath("/agents");
   redirect("/agents");
+}
+
+export async function toggleAgentActiveAction(
+  id: string,
+  nextIsActive: boolean,
+): Promise<void> {
+  await setAgentActive(id, nextIsActive);
+  revalidatePath("/agents");
+  revalidatePath(`/agents/${id}`);
 }
