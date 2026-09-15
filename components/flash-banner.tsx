@@ -3,22 +3,17 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const MESSAGES: Record<string, string> = {
-  created: "Viewing created successfully.",
-  updated: "Viewing updated successfully.",
-  edited: "Viewing edited successfully.",
-  deleted: "Viewing deleted successfully.",
-};
-
 export function FlashBanner({
   param,
   pathname,
+  messages,
 }: {
   param: string | undefined;
   pathname: string;
+  messages: Record<string, string>;
 }) {
   const router = useRouter();
-  const [message] = useState(param ? MESSAGES[param] : undefined);
+  const [message] = useState(param ? messages[param] : undefined);
 
   useEffect(() => {
     if (param) {

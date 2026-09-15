@@ -202,9 +202,9 @@ export function NewViewingForm({
           </label>
           {agents.length === 0 ? (
             <p className="text-sm text-neutral-500">
-              No agents yet.{" "}
-              <a href="/agents/new" className="font-medium text-neutral-900 underline">
-                Add an agent first
+              No active agents yet.{" "}
+              <a href="/admin/accounts" className="font-medium text-neutral-900 underline">
+                Link an agent first
               </a>{" "}
               before creating a viewing.
             </p>
@@ -222,7 +222,6 @@ export function NewViewingForm({
                 <option key={a.id} value={a.id}>
                   {a.name}
                   {a.agent_code ? ` (${a.agent_code})` : ""}
-                  {!a.is_active ? " — Deactivated" : ""}
                 </option>
               ))}
             </select>

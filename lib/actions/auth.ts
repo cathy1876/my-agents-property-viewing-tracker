@@ -163,5 +163,5 @@ export async function linkAccountAction(
 
   revalidatePath("/admin/accounts");
   revalidatePath("/agents");
-  return { success: true };
+  redirect("/agents?linked=1");
 }

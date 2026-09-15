@@ -11,7 +11,7 @@ export function AgentForm({
   agent,
   action,
 }: {
-  agent?: Agent;
+  agent: Agent;
   action: (prev: ActionResult, formData: FormData) => Promise<ActionResult>;
 }) {
   const [state, formAction] = useActionState(action, initialState);
@@ -28,7 +28,7 @@ export function AgentForm({
         <input
           name="name"
           required
-          defaultValue={agent?.name ?? ""}
+          defaultValue={agent.name}
           className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
         />
       </div>
@@ -38,28 +38,26 @@ export function AgentForm({
         </label>
         <input
           name="agent_code"
-          defaultValue={agent?.agent_code ?? ""}
+          defaultValue={agent.agent_code ?? ""}
           className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
         />
       </div>
-      {agent && (
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-neutral-500">
-            Agent Email
-          </label>
-          {agent.agent_email ? (
-            <p className="rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700">
-              {agent.agent_email}
-            </p>
-          ) : (
-            <p className="text-sm text-neutral-500">
-              Not linked to a login yet - the email will appear
-              automatically once this agent is linked via Manage Accounts.
-            </p>
-          )}
-        </div>
-      )}
-      <SubmitButton>{agent ? "Save Changes" : "Add Agent"}</SubmitButton>
+      <div className="flex flex-col gap-1">
+        <label className="text-xs font-medium text-neutral-500">
+          Agent Email
+        </label>
+        {agent.agent_email ? (
+          <p className="rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700">
+            {agent.agent_email}
+          </p>
+        ) : (
+          <p className="text-sm text-neutral-500">
+            Not linked to a login yet - the email will appear automatically
+            once this agent is linked via Manage Accounts.
+          </p>
+        )}
+      </div>
+      <SubmitButton>Save Changes</SubmitButton>
     </form>
   );
 }

@@ -2,34 +2,52 @@ import Link from "next/link";
 import { getAgents } from "@/lib/data/agents";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { AgentStatusBadge } from "@/components/badges";
+import { FlashBanner } from "@/components/flash-banner";
 
 export const dynamic = "force-dynamic";
 
-export default async function AgentsPage() {
+const FLASH_MESSAGES: Record<string, string> = {
+  linked: "Agent linked successfully.",
+  updated: "Agent updated successfully.",
+  deactivated: "Agent deactivated successfully.",
+  reactivated: "Agent reactivated successfully.",
+};
+
+export default async function AgentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}) {
   await requireAdmin();
+  const params = await searchParams;
+  const flashParam = params.linked
+    ? "linked"
+    : params.updated
+      ? "updated"
+      : params.deactivated
+        ? "deactivated"
+        : params.reactivated
+          ? "reactivated"
+          : undefined;
   const agents = await getAgents();
 
   return (
     <div className="mx-auto max-w-4xl">
+      <FlashBanner param={flashParam} pathname="/agents" messages={FLASH_MESSAGES} />
+
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Agents</h1>
-        <Link
-          href="/agents/new"
-          className="inline-flex items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-        >
-          New Agent
-        </Link>
       </div>
 
       {agents.length === 0 ? (
         <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed border-neutral-300 py-16 text-center">
-          <p className="text-neutral-500">No agents yet. Add your first agent.</p>
-          <Link
-            href="/agents/new"
-            className="inline-flex items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-          >
-            New Agent
-          </Link>
+          <p className="text-neutral-500">
+            No agents yet. Link one via{" "}
+            <Link href="/admin/accounts" className="font-medium text-neutral-900 underline">
+              Manage Accounts
+            </Link>
+            .
+          </p>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-neutral-200">

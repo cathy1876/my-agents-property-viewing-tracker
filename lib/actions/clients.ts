@@ -23,21 +23,19 @@ export async function createClientAction(
     return { success: false, error: "Client name is required." };
   }
 
-  let clientId: string;
   try {
-    const client = await createClientRecord({
+    await createClientRecord({
       name,
       phone: String(formData.get("phone") || "").trim() || null,
       email: String(formData.get("email") || "").trim() || null,
       notes: String(formData.get("notes") || "").trim() || null,
     });
-    clientId = client.id;
   } catch (err) {
     return { success: false, error: (err as Error).message };
   }
   revalidatePath("/clients");
   revalidatePath("/viewings");
-  redirect(`/clients/${clientId}`);
+  redirect("/clients?created=1");
 }
 
 export async function updateClientAction(
@@ -63,7 +61,7 @@ export async function updateClientAction(
   revalidatePath("/clients");
   revalidatePath(`/clients/${id}`);
   revalidatePath("/viewings");
-  redirect(`/clients/${id}`);
+  redirect("/clients?updated=1");
 }
 
 export async function deleteClientAction(id: string): Promise<void> {

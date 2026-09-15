@@ -22,6 +22,13 @@ import { OUTCOME_LABEL_MAP } from "@/components/badges";
 
 export const dynamic = "force-dynamic";
 
+const FLASH_MESSAGES: Record<string, string> = {
+  created: "Viewing created successfully.",
+  updated: "Viewing updated successfully.",
+  edited: "Viewing edited successfully.",
+  deleted: "Viewing deleted successfully.",
+};
+
 function FollowUpMarker() {
   return (
     <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-600/30">
@@ -75,7 +82,7 @@ export default async function ViewingsPage({
 
   return (
     <div className="mx-auto max-w-6xl">
-      <FlashBanner param={flashParam} pathname="/viewings" />
+      <FlashBanner param={flashParam} pathname="/viewings" messages={FLASH_MESSAGES} />
 
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold tracking-tight">Viewings</h1>

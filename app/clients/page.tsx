@@ -1,15 +1,29 @@
 import Link from "next/link";
 import { getClients } from "@/lib/data/clients";
 import { getSessionProfile } from "@/lib/auth/session";
+import { FlashBanner } from "@/components/flash-banner";
 
 export const dynamic = "force-dynamic";
 
-export default async function ClientsPage() {
+const FLASH_MESSAGES: Record<string, string> = {
+  created: "Client created successfully.",
+  updated: "Client updated successfully.",
+};
+
+export default async function ClientsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}) {
+  const params = await searchParams;
+  const flashParam = params.created ? "created" : params.updated ? "updated" : undefined;
   const [clients, profile] = await Promise.all([getClients(), getSessionProfile()]);
   const isAdmin = profile?.role === "admin";
 
   return (
     <div className="mx-auto max-w-4xl">
+      <FlashBanner param={flashParam} pathname="/clients" messages={FLASH_MESSAGES} />
+
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Clients</h1>
         {isAdmin && (

@@ -1,10 +1,22 @@
 import Link from "next/link";
 import { getProperties } from "@/lib/data/properties";
 import { getSessionProfile } from "@/lib/auth/session";
+import { FlashBanner } from "@/components/flash-banner";
 
 export const dynamic = "force-dynamic";
 
-export default async function PropertiesPage() {
+const FLASH_MESSAGES: Record<string, string> = {
+  created: "Property created successfully.",
+  updated: "Property updated successfully.",
+};
+
+export default async function PropertiesPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}) {
+  const params = await searchParams;
+  const flashParam = params.created ? "created" : params.updated ? "updated" : undefined;
   const [properties, profile] = await Promise.all([
     getProperties(),
     getSessionProfile(),
@@ -13,6 +25,8 @@ export default async function PropertiesPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
+      <FlashBanner param={flashParam} pathname="/properties" messages={FLASH_MESSAGES} />
+
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Properties</h1>
         {isAdmin && (

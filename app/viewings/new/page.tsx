@@ -1,6 +1,6 @@
 import { getClients } from "@/lib/data/clients";
 import { getProperties } from "@/lib/data/properties";
-import { getAgents } from "@/lib/data/agents";
+import { getActiveAgents } from "@/lib/data/agents";
 import { NewViewingForm } from "./new-viewing-form";
 import { requireAdmin } from "@/lib/auth/require-admin";
 
@@ -9,7 +9,7 @@ export default async function NewViewingPage() {
   const [clients, properties, agents] = await Promise.all([
     getClients(),
     getProperties(),
-    getAgents(),
+    getActiveAgents(),
   ]);
 
   return (

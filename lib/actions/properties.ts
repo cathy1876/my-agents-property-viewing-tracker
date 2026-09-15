@@ -18,20 +18,18 @@ export async function createPropertyAction(
     return { success: false, error: "Property address is required." };
   }
 
-  let propertyId: string;
   try {
-    const property = await createPropertyRecord({
+    await createPropertyRecord({
       address,
       listing_ref: String(formData.get("listing_ref") || "").trim() || null,
       notes: String(formData.get("notes") || "").trim() || null,
     });
-    propertyId = property.id;
   } catch (err) {
     return { success: false, error: (err as Error).message };
   }
   revalidatePath("/properties");
   revalidatePath("/viewings");
-  redirect(`/properties/${propertyId}`);
+  redirect("/properties?created=1");
 }
 
 export async function updatePropertyAction(
@@ -56,7 +54,7 @@ export async function updatePropertyAction(
   revalidatePath("/properties");
   revalidatePath(`/properties/${id}`);
   revalidatePath("/viewings");
-  redirect(`/properties/${id}`);
+  redirect("/properties?updated=1");
 }
 
 export async function deletePropertyAction(id: string): Promise<void> {

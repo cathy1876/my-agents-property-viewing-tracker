@@ -3,8 +3,8 @@ import type { Agent } from "@/lib/types";
 
 // agent_email is deliberately absent here - it's only ever set once, at
 // link time, from the agent's real Supabase Auth email (see
-// createAndLinkAgent in lib/data/accounts.ts), and this ordinary
-// create/update path must never overwrite it.
+// createAndLinkAgent in lib/data/accounts.ts), and this ordinary update
+// path must never overwrite it.
 export interface AgentInput {
   name: string;
   agent_code?: string | null;
@@ -33,19 +33,18 @@ export async function getAgent(id: string): Promise<Agent | null> {
   return data;
 }
 
-export async function createAgentRecord(input: AgentInput): Promise<Agent> {
+// Only used for the New Viewing dropdown, which should never let you
+// assign a viewing to an agent whose login has been deactivated.
+export async function getActiveAgents(): Promise<Agent[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("agents")
-    .insert({
-      name: input.name,
-      agent_code: input.agent_code || null,
-    })
     .select("*")
-    .single();
+    .eq("is_active", true)
+    .order("name", { ascending: true });
 
   if (error) throw new Error(error.message);
-  return data;
+  return data ?? [];
 }
 
 export async function updateAgentRecord(

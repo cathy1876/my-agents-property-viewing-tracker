@@ -17,8 +17,8 @@ export default async function LoginPage({
       <p className="mb-6 text-sm text-neutral-500">Sign in to continue.</p>
       {blocked && (
         <div className="mb-4 rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
-          Your session is no longer valid. Contact Support at [Tel. No.
-          XXXXXXXX] if you believe this is a mistake.
+          Your session is no longer valid. Contact Support at 8363 1122 if
+          you believe this is a mistake.
         </div>
       )}
       <LoginForm />

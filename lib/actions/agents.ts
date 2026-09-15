@@ -2,35 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import {
-  createAgentRecord,
-  setAgentActive,
-  updateAgentRecord,
-} from "@/lib/data/agents";
+import { setAgentActive, updateAgentRecord } from "@/lib/data/agents";
 import type { ActionResult } from "@/lib/actions/clients";
-
-export async function createAgentAction(
-  _prev: ActionResult,
-  formData: FormData,
-): Promise<ActionResult> {
-  const name = String(formData.get("name") || "").trim();
-  if (!name) {
-    return { success: false, error: "Agent name is required." };
-  }
-
-  let agentId: string;
-  try {
-    const agent = await createAgentRecord({
-      name,
-      agent_code: String(formData.get("agent_code") || "").trim() || null,
-    });
-    agentId = agent.id;
-  } catch (err) {
-    return { success: false, error: (err as Error).message };
-  }
-  revalidatePath("/agents");
-  redirect(`/agents/${agentId}`);
-}
 
 export async function updateAgentAction(
   id: string,
@@ -52,7 +25,7 @@ export async function updateAgentAction(
   }
   revalidatePath("/agents");
   revalidatePath(`/agents/${id}`);
-  redirect(`/agents/${id}`);
+  redirect("/agents?updated=1");
 }
 
 export async function toggleAgentActiveAction(
@@ -62,4 +35,5 @@ export async function toggleAgentActiveAction(
   await setAgentActive(id, nextIsActive);
   revalidatePath("/agents");
   revalidatePath(`/agents/${id}`);
+  redirect(nextIsActive ? "/agents?reactivated=1" : "/agents?deactivated=1");
 }
