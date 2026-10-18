@@ -6,6 +6,7 @@ import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { deleteViewingAction } from "@/lib/actions/viewings";
 import { FormattedDateTime } from "@/components/formatted-date-time";
 import { UpdateForm } from "./update-form";
+import { DraftFollowUpButton } from "./draft-followup-button";
 import { getSessionProfile } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
@@ -154,6 +155,10 @@ export default async function ViewingDetailPage({
           currentFollowUp={viewing.follow_up}
         />
       </div>
+
+      {isAdmin && viewing.outcome === "request_another_viewing" && (
+        <DraftFollowUpButton viewingId={id} />
+      )}
     </div>
   );
 }
